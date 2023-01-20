@@ -20,11 +20,6 @@ using System.Xml.Linq;
 
 namespace MOM_Santé
 {
-    public class NodeBrowser
-    {
-
-    }
-
     public partial class Form1 : Form
     {
         
@@ -81,37 +76,46 @@ namespace MOM_Santé
 
             if(isConnexion)
             {
-                try
-                {
-                    endpoint = textBox_endpoint.Text;
-                    if (client == null)
-                    {
-                        client = new OpcClient(endpoint);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Merci d'arreter d'essayer de vous connecter plusieurs fois au serveur");
-                    }
-
-                    client.Connect();
-                    //dotConnexionThread.Abort();
-                    button_connexion.Text = "Connecté";
-                    button_connexion.BackColor = Color.Green;
-                }
-                catch
-                {
-                    Console.WriteLine("Problème de connection au serveur");
-                }
+                Connexion("tt");
             }
             else
             {
                 Console.WriteLine("Deconnexion du serveur avant fermeture ...");
                 client.Disconnect();
-                textBox_Log.Text = "deco";
+                textBox_Log.Text = "Deonnecté";
                 button_connexion.Text = "Déconnecté";
                 button_connexion.BackColor = Color.Red;
             }
         isConnexion = !isConnexion;
+        }
+
+        public void Connexion(string _endpoint)
+        {
+            try
+            {
+                _endpoint = textBox_endpoint.Text;
+                if (client == null)
+                {
+                    client = new OpcClient(_endpoint);
+                }
+                else
+                {
+                    Console.WriteLine("Merci d'arreter d'essayer de vous connecter plusieurs fois au serveur");
+                }
+
+                client.Connect();
+                //dotConnexionThread.Abort();
+                button_connexion.Text = "Connecté";
+                button_connexion.BackColor = Color.Green;
+            }
+            catch
+            {
+                Console.WriteLine("Problème de connection au serveur");
+                for(int i = 0; i < 2; i++)
+                {
+                    Connexion(_endpoint);
+                }
+            }
         }
 
         /*
@@ -134,22 +138,24 @@ namespace MOM_Santé
 
         private void button_find_Click(object sender, EventArgs e)
         {
-            var objectNode = client.BrowseNode(OpcObjectTypes.ObjectsFolder);
+            //var objectNode = client.BrowseNode(OpcObjectTypes.ObjectsFolder);
+            //BrowseOP(objectNode);
+
+            //CLASS//
             
-            BrowseOP(objectNode);
+            NodeBrower nodeBrowser = new NodeBrower(client);
 
-            /*
-            // Create a browse command to browse specific types of references.
-            var browse = new OpcBrowseNode(
-                    nodeId: OpcNodeId.Parse("ns=4;s=Stator.Station.OP120_Bending.InsertionBasket.OP125_01.Traceability_Data"),
-                    degree: OpcBrowseNodeDegree.Generation);
-
-            var node = client.BrowseNode(browse);
-            System.Diagnostics.Debug.WriteLine("BrowseName = {0} Datatype = {1}",node.Attribute(OpcAttribute.DisplayName).Value, node.AttributeValue(OpcAttribute.DataType));
-            */
+            OPList = nodeBrowser.BrowsePostPonedComment(nodeBrowser.rootNode);
+            OPList = nodeBrowser.OPList;
+            int i= 1;
+            foreach(string op in nodeBrowser.OPList)
+            {
+                System.Diagnostics.Debug.WriteLine(op);
+                //System.Diagnostics.Debug.WriteLine(nodeBrowser.PostPoneList[i]);
+                i++;
+            }
         }
 
-        NodeBrower paul = new NodeBrower();
         
         private void BrowseOP(OpcNodeInfo node, int level = 0,string datacollectDataType = "ns=2;i=1304")
         {
@@ -158,26 +164,29 @@ namespace MOM_Santé
             */
 
             string browseName = node.Attribute(OpcAttribute.BrowseName).Value.ToString();
-            string dataType = node.AttributeValue(OpcAttribute.DataType).ToString()
+
             try
             {  
-                if (dataType != null)
+                if (node.AttributeValue(OpcAttribute.DataType) != null)
                 {
+                    string dataType = node.AttributeValue(OpcAttribute.DataType).ToString();
                     if (dataType == datacollectDataType)
                     {
                         //OPList.Add(node.Attribute(OpcAttribute.BrowseName).Value.ToString());
                         textBox_Log.Text = textBox_Log.Text + Environment.NewLine + node.Attribute(OpcAttribute.BrowseName).Value.ToString();
                     }
-                }
 
-                else if (browseName != null)
-                {
-                    if (browseName == "PostponedComment")
+                    if (node.Attribute(OpcAttribute.BrowseName).Value.ToString() != null)
                     {
-                        //OPList.Add(node.Attribute(OpcAttribute.BrowseName).Value.ToString());
-                        textBox_Log.Text = textBox_Log.Text + Environment.NewLine + node.Attribute(OpcAttribute.BrowseName).Value.ToString();
+                        if (browseName == "PostponedComment")
+                        {
+                            //OPList.Add(node.Attribute(OpcAttribute.BrowseName).Value.ToString());
+                            textBox_Log.Text = textBox_Log.Text + Environment.NewLine + node.Attribute(OpcAttribute.BrowseName).Value.ToString();
+                        }
                     }
                 }
+
+                
 
 
                 level++;
