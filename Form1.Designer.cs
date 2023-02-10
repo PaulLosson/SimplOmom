@@ -32,6 +32,7 @@
             this.textBox_Log = new System.Windows.Forms.TextBox();
             this.button_connexion = new System.Windows.Forms.Button();
             this.textBox_endpoint = new System.Windows.Forms.TextBox();
+            this.textBox_Assemblage = new System.Windows.Forms.TextBox();
             button_find = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -47,13 +48,13 @@
             // 
             // textBox_Log
             // 
-            this.textBox_Log.Location = new System.Drawing.Point(114, 38);
+            this.textBox_Log.Location = new System.Drawing.Point(114, 99);
             this.textBox_Log.Multiline = true;
             this.textBox_Log.Name = "textBox_Log";
             this.textBox_Log.ReadOnly = true;
             this.textBox_Log.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.textBox_Log.ShortcutsEnabled = false;
-            this.textBox_Log.Size = new System.Drawing.Size(588, 354);
+            this.textBox_Log.Size = new System.Drawing.Size(189, 293);
             this.textBox_Log.TabIndex = 0;
             this.textBox_Log.UseSystemPasswordChar = true;
             this.textBox_Log.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
@@ -79,6 +80,19 @@
             this.textBox_endpoint.TabIndex = 3;
             this.textBox_endpoint.Text = "opc.tcp://EX0012.inetemotors.com:6011/LineMiddleware1";
             // 
+            // textBox_Assemblage
+            // 
+            this.textBox_Assemblage.Location = new System.Drawing.Point(432, 99);
+            this.textBox_Assemblage.Multiline = true;
+            this.textBox_Assemblage.Name = "textBox_Assemblage";
+            this.textBox_Assemblage.ReadOnly = true;
+            this.textBox_Assemblage.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
+            this.textBox_Assemblage.ShortcutsEnabled = false;
+            this.textBox_Assemblage.Size = new System.Drawing.Size(189, 293);
+            this.textBox_Assemblage.TabIndex = 4;
+            this.textBox_Assemblage.UseSystemPasswordChar = true;
+            // this.textBox_Assemblage.TextChanged += new System.EventHandler(this.textBox_Assemblage_TextChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -86,6 +100,7 @@
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1733, 491);
+            this.Controls.Add(this.textBox_Assemblage);
             this.Controls.Add(this.textBox_endpoint);
             this.Controls.Add(button_find);
             this.Controls.Add(this.button_connexion);
@@ -103,5 +118,6 @@
         private TextBox textBox_Log;
         private Button button_connexion;
         private TextBox textBox_endpoint;
+        private TextBox textBox_Assemblage;
     }
 }

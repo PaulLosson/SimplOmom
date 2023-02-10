@@ -20,14 +20,42 @@ using System.Xml.Linq;
 
 namespace MOM_Santé
 {
-    public partial class Form1 : Form
+    [OpcDataType("ns=2;s=Serial_Number_DataType")]
+    [OpcDataTypeEncoding("ns=2;s=Serial_Number_DataType-Binary")]
+    public class Serial_Number_DataType
+    {
+        public string Customer_Id { get; set; }
+        public string Emotors_Id { get; set; }
+        public string Supplier_Id { get; set; }
+        public string Tracking_Id { get; set; }
+    }
+
+
+    [OpcDataType("ns=1;i=97")]
+    [OpcDataTypeEncoding(
+        "<ns=1;i=97>",
+        NamespaceUri = "<http://Emotors/Types/Shared.Value of binary Dictionary-Node>")]
+    internal struct CheckReferenceDataType
+    {
+        public Boolean Bad;
+        public Boolean CheckRequested;
+        public Boolean ErrorTrackingId;
+        public Boolean Good;
+        public String ReferenceToCheck;
+        public Boolean ResultPresent;
+        public String TrackingId;
+        public String Type;
+    }
+
+
+        public partial class Form1 : Form
     {
         
 
         //Parametre connexion serveur
         string endpoint = "Startup";
         OpcClient client;
-        private Boolean autoConnect = true;
+        private Boolean autoConnect = false;
         private Boolean isConnexion = true;
         
 
@@ -35,15 +63,13 @@ namespace MOM_Santé
         static readonly string rootFolder = @"C:\Temp\Data\";
         //Default file. MAKE SURE TO CHANGE THIS LOCATION AND FILE PATH TO YOUR FILE   
         static readonly string textFile = @"C:\Users\JV16065\Desktop\PreProd local\Line_Middleware_V2\Logs\VpiLine-26000.log";
-
-        //Pasing Parameters
-        List<string> OPList = new List<string>();
-
+        static readonly string sharedClass = @"C:\Users\JV16065\Desktop\TEST SHAReD\PREPROD (local) SPRINT 7\LM\Project\Opc.Ua.NodeSet2.Emotors.Types.Shared.xml";
 
         public Form1()
         {
             InitializeComponent();
-            textBox_endpoint.Text = "opc.tcp://EX0012.inetemotors.com:6011/LineMiddleware1";
+            textBox_endpoint.Text = "opc.tcp://EX0012.inetemotors.com:6002/LM";
+            
             endpoint = textBox_endpoint.Text;
             if (autoConnect)
             {
@@ -82,7 +108,7 @@ namespace MOM_Santé
             {
                 Console.WriteLine("Deconnexion du serveur avant fermeture ...");
                 client.Disconnect();
-                textBox_Log.Text = "Deonnecté";
+                textBox_Log.Text = "Deconnecté";
                 button_connexion.Text = "Déconnecté";
                 button_connexion.BackColor = Color.Red;
             }
@@ -97,12 +123,14 @@ namespace MOM_Santé
                 if (client == null)
                 {
                     client = new OpcClient(_endpoint);
+                    //client.NodeSet = OpcNodeSet.Load(@"C:\Users\JV16065\Desktop\TEST SHAReD\PREPROD (local) SPRINT 7\LM\Project\Opc.Ua.NodeSet2.Emotors.Types.Shared.xml");
                 }
                 else
                 {
                     Console.WriteLine("Merci d'arreter d'essayer de vous connecter plusieurs fois au serveur");
                 }
-
+                client.UseDynamic = true;
+                
                 client.Connect();
                 //dotConnexionThread.Abort();
                 button_connexion.Text = "Connecté";
@@ -111,10 +139,14 @@ namespace MOM_Santé
             catch
             {
                 Console.WriteLine("Problème de connection au serveur");
-                for(int i = 0; i < 2; i++)
+                button_connexion.Text = "XXXXXXX";
+                /*
+                for (int i = 0; i > 2; i++)
                 {
-                    Connexion(_endpoint);
+                    client.Connect();
+                    textBox_endpoint.Text = "tentative " + i + " sur 3";
                 }
+                */
             }
         }
 
@@ -144,62 +176,42 @@ namespace MOM_Santé
             //CLASS//
             
             NodeBrower nodeBrowser = new NodeBrower(client);
+            nodeBrowser.BrowsePostPonedComment(nodeBrowser.rootNode);
 
-            OPList = nodeBrowser.BrowsePostPonedComment(nodeBrowser.rootNode);
-            OPList = nodeBrowser.OPList;
-            int i= 1;
+            System.Diagnostics.Debug.WriteLine(nodeBrowser.OPList.Count().ToString() + nodeBrowser.PostPoneList.Count().ToString());
+
+            int i= 0;
             foreach(string op in nodeBrowser.OPList)
             {
+                textBox_Assemblage.Text = textBox_Assemblage.Text + op;
                 System.Diagnostics.Debug.WriteLine(op);
-                //System.Diagnostics.Debug.WriteLine(nodeBrowser.PostPoneList[i]);
+                System.Diagnostics.Debug.WriteLine(nodeBrowser.PostPoneList[i]);
+                UASubscribe(nodeBrowser.PostPoneList[i]);
                 i++;
             }
         }
-
         
-        private void BrowseOP(OpcNodeInfo node, int level = 0,string datacollectDataType = "ns=2;i=1304")
+        public void UASubscribe(String _nodeId)
         {
-            /*
-            Check if it's a Datacollect comparing datatypes
-            */
+            //Conversion of String in Byte array for OPC UA Subscription
+            byte[] bytes = Encoding.Default.GetBytes(_nodeId);
 
-            string browseName = node.Attribute(OpcAttribute.BrowseName).Value.ToString();
-
-            try
-            {  
-                if (node.AttributeValue(OpcAttribute.DataType) != null)
-                {
-                    string dataType = node.AttributeValue(OpcAttribute.DataType).ToString();
-                    if (dataType == datacollectDataType)
-                    {
-                        //OPList.Add(node.Attribute(OpcAttribute.BrowseName).Value.ToString());
-                        textBox_Log.Text = textBox_Log.Text + Environment.NewLine + node.Attribute(OpcAttribute.BrowseName).Value.ToString();
-                    }
-
-                    if (node.Attribute(OpcAttribute.BrowseName).Value.ToString() != null)
-                    {
-                        if (browseName == "PostponedComment")
-                        {
-                            //OPList.Add(node.Attribute(OpcAttribute.BrowseName).Value.ToString());
-                            textBox_Log.Text = textBox_Log.Text + Environment.NewLine + node.Attribute(OpcAttribute.BrowseName).Value.ToString();
-                        }
-                    }
-                }
-
-                
-
-
-                level++;
-
-                foreach (var childNode in node.Children())
-                    BrowseOP(childNode, level);
-            }
-            catch
-            {
-                System.Diagnostics.Debug.WriteLine("ERROR");
-
-            }
+            //Creating subscription for Each PostponedComment
+            OpcSubscription subscription = client.SubscribeDataChange(
+            _nodeId,
+            HandleDataChanged);
         }
 
+
+        private static void HandleDataChanged(object sender, OpcDataChangeReceivedEventArgs e)
+        {
+            // The 'sender' variable contains the OpcMonitoredItem with the NodeId.
+            OpcMonitoredItem item = (OpcMonitoredItem)sender;
+
+            System.Diagnostics.Debug.WriteLine(
+                    "Data Change from NodeId '{0}': {1}",
+                    item.NodeId,
+                    e.Item.Value);
+        }
     }
 }

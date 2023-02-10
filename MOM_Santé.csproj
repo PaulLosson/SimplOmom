@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FastExcel" Version="3.0.13" />
     <PackageReference Include="Opc.UaFx.Client" Version="2.30.0" />
   </ItemGroup>
 

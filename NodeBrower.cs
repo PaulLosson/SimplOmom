@@ -4,46 +4,33 @@ using Opc.Ua;
 
 namespace MOM_Santé
 {
-    /*
-    internal class PPOPList
-    {
-        public List<string> datacollectList = new List<string>();
-        public List<string> PostPoneOP = new List<string>();
-
-        public PPOPList()
-        {
-            datacollectList = new List<string>();
-            PostPoneOP = new List<string>();
-        }
-
-        public void Append(string OP, string postponeComment)
-        {
-            datacollectList.Add(OP);
-            PostPoneOP.Add(postponeComment);
-        }
-    }
-    */
-
     internal class NodeBrower
     {
         //Fields
+        OpcClient client;
         //Pasing Parameters
         public OpcNodeInfo rootNode;
 
         public List<string> OPList = new List<string>();
         public List<string> PostPoneList = new List<string>();
-
+        
         public NodeBrower(OpcClient _client)
         {
-            OpcClient client = _client;
+            //Initailizing client
+            client = _client;
+
+            //Initializing the root node from the server
             rootNode = client.BrowseNode(OpcObjectTypes.ObjectsFolder);
         }
 
-
-        public List<string> BrowseOP(OpcNodeInfo node, int level = 0, string datacollectDataType = "ns=2;i=1304")
+        public void BrowsePostPonedComment(OpcNodeInfo node, int level = 0, string OPDataType = "ns=2;i=1304", string attributeToFind= "PostponedComment")
         {
             /*
             Check if it's a Datacollect comparing datatypes
+            Then get the NodeId of PostponedComment
+            Fill 2 lists
+            One for the OP Name
+            One for the corresponding NodeId of PPComment
             */
 
             try
@@ -54,88 +41,32 @@ namespace MOM_Santé
                     string dataType = node.AttributeValue(OpcAttribute.DataType).ToString();
                     if (dataType != null)
                     {
-                        if (dataType == datacollectDataType)
+                        if (dataType == OPDataType)
                         {
-                            System.Diagnostics.Debug.WriteLine("{0} TRACEABILITY DATA ADDED", browseName.ToString());
-                            OPList.Add(browseName.ToString());
-                            
-                            System.Diagnostics.Debug.WriteLine("List : {0}", OPList.ToArray().ToString());
-
-                            
-
-                        }
-                    }
-
-                    else if (browseName != null)
-                    {
-                        if (browseName == "PostponedComment")
-                        {
-                            OPList.Add(browseName.ToString());
-                        }
-                    }
-                }
-
-            level++;
-
-            foreach (var childNode in node.Children())
-                BrowseOP(childNode, level);
-            }
-            catch
-            {
-                System.Diagnostics.Debug.WriteLine("ERROR");
-            }
-            return OPList;
-        }
-
-
-
-
-        public List<string> BrowsePostPonedComment(OpcNodeInfo node, int level = 0, string datacollectDataType = "ns=2;i=1304")
-        {
-            /*
-            Check if it's a Datacollect comparing datatypes
-            */
-
-            try
-            {
-                if (node.AttributeValue(OpcAttribute.DataType) != null)
-                {
-                    string browseName = node.Attribute(OpcAttribute.BrowseName).Value.ToString();
-                    string dataType = node.AttributeValue(OpcAttribute.DataType).ToString();
-                    if (dataType != null)
-                    {
-                        if (dataType == datacollectDataType)
-                        {
-                            OpcNodeInfo OPNode = node;
-                            foreach(var childNode in OPNode.Children())
+                            foreach(var childNode in node.Children())
                             {
-                                if (browseName != null)
+                                string ChildbrowseName = childNode.Name.ToString();
+                                if (ChildbrowseName != null)
                                 {
-                                    if (browseName == "PostponedComment")
+                                    if (ChildbrowseName.Contains(attributeToFind))
                                     {
+                                        System.Diagnostics.Debug.WriteLine(browseName.ToString());
                                         OPList.Add(browseName.ToString());
-                                        System.Diagnostics.Debug.WriteLine("OP AJOUTED");
-                                        PostPoneList.Add(OPNode.Attribute(OpcAttribute.BrowseName).Value.ToString());
-                                        System.Diagnostics.Debug.WriteLine("PP AJOUTED");
+                                        PostPoneList.Add(childNode.NodeId.ToString());
                                     }
                                 }
                             }
-
                         }
                     }
                 }
-
                 level++;
-
                 foreach (var childNode in node.Children())
-                    BrowseOP(childNode, level);
+                    BrowsePostPonedComment(childNode, level);
             }
             catch
             {
                 System.Diagnostics.Debug.WriteLine("ERROR");
             }
-            return OPList;
         }
-
     }
 }
