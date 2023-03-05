@@ -91,7 +91,6 @@
             this.textBox_Assemblage.Size = new System.Drawing.Size(189, 293);
             this.textBox_Assemblage.TabIndex = 4;
             this.textBox_Assemblage.UseSystemPasswordChar = true;
-            // this.textBox_Assemblage.TextChanged += new System.EventHandler(this.textBox_Assemblage_TextChanged);
             // 
             // Form1
             // 
@@ -107,6 +106,7 @@
             this.Controls.Add(this.textBox_Log);
             this.Name = "Form1";
             this.Text = "MOM_Santé";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

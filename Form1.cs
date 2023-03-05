@@ -17,41 +17,15 @@ using Opc.UaFx;
 using System.ComponentModel.DataAnnotations;
 using Opc.Ua;
 using System.Xml.Linq;
+using Org.BouncyCastle.Asn1.Cms;
+using System.Runtime.CompilerServices;
 
 namespace MOM_Santé
 {
-    [OpcDataType("ns=2;s=Serial_Number_DataType")]
-    [OpcDataTypeEncoding("ns=2;s=Serial_Number_DataType-Binary")]
-    public class Serial_Number_DataType
+    public partial class Form1 : Form
     {
-        public string Customer_Id { get; set; }
-        public string Emotors_Id { get; set; }
-        public string Supplier_Id { get; set; }
-        public string Tracking_Id { get; set; }
-    }
 
-
-    [OpcDataType("ns=1;i=97")]
-    [OpcDataTypeEncoding(
-        "<ns=1;i=97>",
-        NamespaceUri = "<http://Emotors/Types/Shared.Value of binary Dictionary-Node>")]
-    internal struct CheckReferenceDataType
-    {
-        public Boolean Bad;
-        public Boolean CheckRequested;
-        public Boolean ErrorTrackingId;
-        public Boolean Good;
-        public String ReferenceToCheck;
-        public Boolean ResultPresent;
-        public String TrackingId;
-        public String Type;
-    }
-
-
-        public partial class Form1 : Form
-    {
-        
-
+        static string PPNotification;
         //Parametre connexion serveur
         string endpoint = "Startup";
         OpcClient client;
@@ -64,11 +38,12 @@ namespace MOM_Santé
         //Default file. MAKE SURE TO CHANGE THIS LOCATION AND FILE PATH TO YOUR FILE   
         static readonly string textFile = @"C:\Users\JV16065\Desktop\PreProd local\Line_Middleware_V2\Logs\VpiLine-26000.log";
         static readonly string sharedClass = @"C:\Users\JV16065\Desktop\TEST SHAReD\PREPROD (local) SPRINT 7\LM\Project\Opc.Ua.NodeSet2.Emotors.Types.Shared.xml";
+        
 
         public Form1()
         {
             InitializeComponent();
-            textBox_endpoint.Text = "opc.tcp://EX0012.inetemotors.com:6002/LM";
+            textBox_endpoint.Text = "opc.tcp://EX0012.inetemotors.com:5776/UMY_D210_Mod1_Assembly";
             
             endpoint = textBox_endpoint.Text;
             if (autoConnect)
@@ -170,11 +145,8 @@ namespace MOM_Santé
 
         private void button_find_Click(object sender, EventArgs e)
         {
-            //var objectNode = client.BrowseNode(OpcObjectTypes.ObjectsFolder);
-            //BrowseOP(objectNode);
-
             //CLASS//
-            
+
             NodeBrower nodeBrowser = new NodeBrower(client);
             nodeBrowser.BrowsePostPonedComment(nodeBrowser.rootNode);
 
@@ -183,15 +155,21 @@ namespace MOM_Santé
             int i= 0;
             foreach(string op in nodeBrowser.OPList)
             {
-                textBox_Assemblage.Text = textBox_Assemblage.Text + op;
+                textBox_Assemblage.Text = textBox_Assemblage.Text + nodeBrowser.PostPoneList[i];
+                textBox_Log.Text = textBox_Log.Text + op;
                 System.Diagnostics.Debug.WriteLine(op);
                 System.Diagnostics.Debug.WriteLine(nodeBrowser.PostPoneList[i]);
-                UASubscribe(nodeBrowser.PostPoneList[i]);
+                UASubscribe(nodeBrowser.PostPoneList[i], op);
                 i++;
             }
         }
+
+        public void AddNotificationPostPone(string momNotif)
+        {
+            textBox_Assemblage.Text = textBox_Assemblage + momNotif;
+        }
         
-        public void UASubscribe(String _nodeId)
+        public void UASubscribe(String _nodeId, string op)
         {
             //Conversion of String in Byte array for OPC UA Subscription
             byte[] bytes = Encoding.Default.GetBytes(_nodeId);
@@ -202,16 +180,18 @@ namespace MOM_Santé
             HandleDataChanged);
         }
 
+        // TODO DiscoveryClient
 
-        private static void HandleDataChanged(object sender, OpcDataChangeReceivedEventArgs e)
+        public static void HandleDataChanged(object sender, OpcDataChangeReceivedEventArgs e)
         {
             // The 'sender' variable contains the OpcMonitoredItem with the NodeId.
             OpcMonitoredItem item = (OpcMonitoredItem)sender;
-
             System.Diagnostics.Debug.WriteLine(
-                    "Data Change from NodeId '{0}': {1}",
+                    "Data Change from NodeId '{0}': {1} at {2}",
                     item.NodeId,
-                    e.Item.Value);
+                    e.Item.Value, e.Item.Value.SourceTimestamp);
         }
     }
+
+
 }

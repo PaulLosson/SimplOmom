@@ -4,58 +4,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading.Tasks;                                           
 using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace MOM_Santé
 {
-    internal class ChienLoup
+    internal class ChienLoup : OpcDataChangeReceivedEventArgs
     {
-        //Fields
-        OpcClient client;
+        public List<string> resultList = new List<string>();
+        public bool Cancel { get; set; }
 
-
-
-        public ChienLoup(OpcClient _client)
+        /*
+        public ChienLoup(string nodeid,OpcDataChangeReceivedEventHandler handler, List<string> resultList)
         {
-            //Initailizing client
-            client = _client;
-
-            
+            this.resultList = resultList;
         }
+        */
+    }
 
-        public void PostPonedCommentSubscribe()
-        {
-            //Browse Nodes Form NodeBrowser Class
-            NodeBrower nodeBrowser = new NodeBrower(client);
-            nodeBrowser.BrowsePostPonedComment(nodeBrowser.rootNode);
+    public bool fireEvent()
+    {
+        ChienLoup e = new ChienLoup();
 
-            System.Diagnostics.Debug.WriteLine(nodeBrowser.OPList.Count().ToString() + nodeBrowser.PostPoneList.Count().ToString());
+        //Don't forget a null check, assume this is an event
+        FireEventHandler(this, e);
 
-            foreach (string pp in nodeBrowser.PostPoneList)
-            {
-                //Conversion of String in Byte array for OPC UA Subscription
-                byte[] bytes = Encoding.Default.GetBytes(pp); 
+        return e.Cancel;
+    }
 
-                //Creating subscription for Each PostponedComment
-                OpcSubscription subscription = client.SubscribeDataChange(
-                pp,
-                HandleDataChanged);
-            }
-        }
-
-
-        private static void HandleDataChanged(object sender,OpcDataChangeReceivedEventArgs e)
-        {
-            // The 'sender' variable contains the OpcMonitoredItem with the NodeId.
-            OpcMonitoredItem item = (OpcMonitoredItem)sender;
-
-            System.Diagnostics.Debug.WriteLine(
-                    "Data Change from NodeId '{0}': {1}",
-                    item.NodeId,
-                    e.Item.Value);
-        }
-
-
+    public void HandleFireEvent(object sender, ChienLoup e)
+    {
+        e.Cancel = true;
     }
 }
