@@ -1,0 +1,9 @@
+copy C:\OpenOpcUa_Project\OpenOpcUa\x64\Debug-IPV4\*.pdb .\
+copy C:\OpenOpcUa_Project\OpenOpcUa\Vpis\OpenOpcUaVpiLibrary\x64\Debug-IPV4\*.pdb .\
+copy C:\OpenOpcUa_Project\OpenOpcUa\Vpis\VpiValuesInit\x64\Debug\*.pdb .\
+copy C:\OpenOpcUa_Project\OpenOpcUa\Vpis\VpiS7\x64\Debug\*.pdb .\
+copy C:\OpenOpcUa_Project\OpenOpcUa\Vpis\VpiIUaClnt\x64\Debug-IPV4\*.pdb .\
+copy C:\OpenOpcUa_Project\OpenOpcUa\OpenOpcUaClientSdk\OpenOpcUaClientLib\x64\Debug-IPV4\*.pdb .\
+copy C:\OpenOpcUa_Project\OpenOpcUa\Vfis\OpenOpcUaVfiLibrary\x64\Debug\*.pdb .\
+copy C:\OpenOpcUa_Project\OpenOpcUa\Vfis\VfiPgSql\x64\Debug\*.pdb .\
+copy C:\OpenOpcUa_Project\OpenOpcUa\Vpis\GenericEncoderDecoder\x64\Debug\*.pdb .\

@@ -1,6 +1,7 @@
 ﻿using Opc.UaFx.Client;
 using Opc.UaFx;
 using Opc.Ua;
+using System.ComponentModel;
 
 namespace MOM_Santé
 {
@@ -12,8 +13,14 @@ namespace MOM_Santé
         public OpcNodeInfo rootNode;
 
         public List<string> OPList = new List<string>();
+        public List<string> PostPoneEList = new List<string>();
         public List<string> PostPoneList = new List<string>();
-        
+        public List<string> trkList = new List<string>();
+
+        //Todestroy
+        public List<string> baseNodeList = new List<string>();
+        public List<string> typeList = new List<string>();
+
         public NodeBrower(OpcClient _client)
         {
             //Initailizing client
@@ -23,8 +30,9 @@ namespace MOM_Santé
             rootNode = client.BrowseNode(OpcObjectTypes.ObjectsFolder);
         }
 
-        public void BrowsePostPonedComment(OpcNodeInfo node, int level = 0, string OPDataType = "ns=2;i=1304", string attributeToFind= "PostponedComment")
+        public WatchList BrowsePostPonedComment(OpcNodeInfo node, int level = 0, string OPDataType = "ns=2;i=1304", string ppeAttributeToFind = "PostponedEnabled", string ppcAttributeToFind= "PostponedComment", string trkAttributeToFind = " ")
         {
+            string sendManualDCNode = "";
             /*
             Check if it's a Datacollect comparing datatypes
             Then get the NodeId of PostponedComment
@@ -32,7 +40,6 @@ namespace MOM_Santé
             One for the OP Name
             One for the corresponding NodeId of PPComment
             */
-
             try
             {
                 if (node.AttributeValue(OpcAttribute.DataType) != null)
@@ -48,11 +55,16 @@ namespace MOM_Santé
                                 string ChildbrowseName = childNode.Name.ToString();
                                 if (ChildbrowseName != null)
                                 {
-                                    if (ChildbrowseName.Contains(attributeToFind))
+                                    if (ChildbrowseName.Contains(ppeAttributeToFind))
                                     {
-                                        System.Diagnostics.Debug.WriteLine(browseName.ToString());
-                                        OPList.Add(browseName.ToString());
-                                        PostPoneList.Add(childNode.NodeId.ToString());
+                                        //OPNumber
+                                        OPList.Add(node.Parents().ToList()[0].Name.ToString());
+                                        //baseNode
+                                        baseNodeList.Add(node.NodeId.ToString());
+                                    }
+                                    else if(ChildbrowseName.Contains("SendManualDataCollect")) 
+                                    { 
+                                        sendManualDCNode = childNode.NodeId.ToString();
                                     }
                                 }
                             }
@@ -67,6 +79,9 @@ namespace MOM_Santé
             {
                 System.Diagnostics.Debug.WriteLine("ERROR");
             }
+
+            WatchList watchList = new WatchList(OPList, baseNodeList, sendManualDCNode);
+            return watchList;
         }
     }
 }

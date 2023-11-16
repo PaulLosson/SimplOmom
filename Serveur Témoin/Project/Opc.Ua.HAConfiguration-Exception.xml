@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Version 1.00 -->
+<UANodeSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris>
+    <Uri>http://www.openopcua.org/Ha/Exception</Uri>
+  </NamespaceUris>
+  <Aliases>
+    <Alias Alias="Boolean">i=1</Alias>
+    <Alias Alias="SByte">i=2</Alias>
+    <Alias Alias="Byte">i=3</Alias>
+    <Alias Alias="Int16">i=4</Alias>
+    <Alias Alias="UInt16">i=5</Alias>
+    <Alias Alias="Int32">i=6</Alias>
+    <Alias Alias="UInt32">i=7</Alias>
+    <Alias Alias="Int64">i=8</Alias>
+    <Alias Alias="UInt64">i=9</Alias>
+    <Alias Alias="Float">i=10</Alias>
+    <Alias Alias="Double">i=11</Alias>
+    <Alias Alias="DateTime">i=13</Alias>
+    <Alias Alias="String">i=12</Alias>
+    <Alias Alias="ByteString">i=15</Alias>
+    <Alias Alias="Guid">i=14</Alias>
+    <Alias Alias="XmlElement">i=16</Alias>
+    <Alias Alias="NodeId">i=17</Alias>
+    <Alias Alias="ExpandedNodeId">i=18</Alias>
+    <Alias Alias="QualifiedName">i=20</Alias>
+    <Alias Alias="LocalizedText">i=21</Alias>
+    <Alias Alias="StatusCode">i=19</Alias>
+    <Alias Alias="Structure">i=22</Alias>
+    <Alias Alias="Number">i=26</Alias>
+    <Alias Alias="Integer">i=27</Alias>
+    <Alias Alias="UInteger">i=28</Alias>
+    <Alias Alias="HasComponent">i=47</Alias>
+    <Alias Alias="HasProperty">i=46</Alias>
+    <Alias Alias="Organizes">i=35</Alias>
+    <Alias Alias="HasEventSource">i=36</Alias>
+    <Alias Alias="HasNotifier">i=48</Alias>
+    <Alias Alias="HasSubtype">i=45</Alias>
+    <Alias Alias="HasTypeDefinition">i=40</Alias>
+    <Alias Alias="HasModellingRule">i=37</Alias>
+    <Alias Alias="HasEncoding">i=38</Alias>
+    <Alias Alias="HasDescription">i=39</Alias>
+    <Alias Alias="HasHistoricalConfiguration">i=56</Alias>
+  </Aliases>
+  <UAObject NodeId="ns=1;i=100" BrowseName="HA Configuration">
+    <DisplayName>OpenOpcUaHistorianConfig</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent">ns=1;i=101</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=102</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=103</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=104</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=105</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=106</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=107</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=108</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=109</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=110</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=2318</Reference>
+    </References>
+  </UAObject>
+  <!--Defintion of the AggregateConfiguration of the OpenOpcUaHistorianConfig-->
+  <UAObject NodeId="ns=1;i=101" BrowseName="AggregateConfiguration">
+    <DisplayName>AggregateConfiguration</DisplayName>
+    <References>
+ 
+      <Reference ReferenceType="HasTypeDefinition">i=11187</Reference>
+      <Reference ReferenceType="HasModellingRule">i=78</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">i=2318</Reference>
+    </References>
+  </UAObject>
+
+  <UAObject NodeId="ns=1;i=102" BrowseName="AggregateFunctions">
+    <DisplayName>AggregateFunctions</DisplayName>
+    <Description>A folder for the real time aggregates supported by the server.</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+      <Reference ReferenceType="HasModellingRule">i=78</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;i=103" BrowseName="Stepped" DataType="Boolean">
+    <DisplayName>Stepped</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+    </References>
+    <Value>
+      <Boolean xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">true</Boolean>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=104" BrowseName="Definition" DataType="String">
+    <DisplayName>String</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=105" BrowseName="MaxTimeInterval" DataType="i=290">
+    <DisplayName>MaxTimeInterval</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+    </References>
+    <Value>
+      <Duration xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">5000.00</Duration>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=106" BrowseName="MinTimeInterval" DataType="i=290">
+    <DisplayName>MinTimeInterval</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+    </References>
+    <Value>
+      <Duration xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">100.00</Duration>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=107" BrowseName="ExceptionDeviation" DataType="Double">
+    <DisplayName>ExceptionDeviation</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+    </References>
+    <Value>
+      <Double xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">0.00</Double>
+    </Value>	
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=108" BrowseName="ExceptionDeviationFormat" DataType="i=890">
+    <DisplayName>ExceptionDeviationFormat</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+    </References>
+    <Value>
+      <Int16 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">0</Int16>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=109" BrowseName="StartOfArchive" DataType="i=294">
+    <DisplayName>StartOfArchive</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=110" BrowseName="StartOnlineOfArchive" DataType="i=294">
+    <DisplayName>StartOnlineOfArchive</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+    </References>
+  </UAVariable>    
+</UANodeSet>

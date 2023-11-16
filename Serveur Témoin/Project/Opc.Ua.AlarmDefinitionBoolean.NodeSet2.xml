@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--OPCUA Normative FileNodeSet for AddressSpace configuration-->
+
+<UANodeSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+	<NamespaceUris>
+		<Uri>http://opcfoundation.org/OpenOpcUa/AlarmBoolean</Uri>
+	</NamespaceUris>
+	<Aliases>
+		<Alias Alias="Boolean">i=00001</Alias>
+		<Alias Alias="SByte">i=00002</Alias>
+		<Alias Alias="Byte">i=00003</Alias>
+		<Alias Alias="Int16">i=00004</Alias>
+		<Alias Alias="UInt16">i=00005</Alias>
+		<Alias Alias="Int32">i=00006</Alias>
+		<Alias Alias="UInt32">i=00007</Alias>
+		<Alias Alias="Int64">i=00008</Alias>
+		<Alias Alias="UInt64">i=00009</Alias>
+		<Alias Alias="Float">i=00010</Alias>
+		<Alias Alias="Double">i=00011</Alias>
+		<Alias Alias="String">i=00012</Alias>
+		<Alias Alias="DateTime">i=00013</Alias>
+		<Alias Alias="Guid">i=00014</Alias>
+		<Alias Alias="ByteString">i=00015</Alias>
+		<Alias Alias="XmlElement">i=00016</Alias>
+		<Alias Alias="NodeId">i=00017</Alias>
+		<Alias Alias="ExpandedNodeId">i=00018</Alias>
+		<Alias Alias="StatusCode">i=00019</Alias>
+		<Alias Alias="QualifiedName">i=00020</Alias>
+		<Alias Alias="LocalizedText">i=00021</Alias>
+		<Alias Alias="Structure">i=00022</Alias>
+		<Alias Alias="DataValue">i=00023</Alias>
+		<Alias Alias="BaseDataType">i=00024</Alias>
+		<Alias Alias="DiagnosticInfo">i=00025</Alias>
+		<Alias Alias="Number">i=00026</Alias>
+		<Alias Alias="Integer">i=00027</Alias>
+		<Alias Alias="UInteger">i=00028</Alias>
+		<Alias Alias="Enumeration">i=00029</Alias>
+		<Alias Alias="Image">i=00030</Alias>
+		<Alias Alias="References">i=00031</Alias>
+		<Alias Alias="NonHierarchicalReferences">i=00032</Alias>
+		<Alias Alias="HierarchicalReferences">i=00033</Alias>
+		<Alias Alias="HasChild">i=00034</Alias>
+		<Alias Alias="Organizes">i=00035</Alias>
+		<Alias Alias="HasEventSource">i=00036</Alias>
+		<Alias Alias="HasModellingRule">i=00037</Alias>
+		<Alias Alias="HasEncoding">i=00038</Alias>
+		<Alias Alias="HasDescription">i=00039</Alias>
+		<Alias Alias="HasTypeDefinition">i=00040</Alias>
+		<Alias Alias="GeneratesEvent">i=00041</Alias>
+		<Alias Alias="Aggregates">i=00044</Alias>
+		<Alias Alias="HasSubtype">i=00045</Alias>
+		<Alias Alias="HasProperty">i=00046</Alias>
+		<Alias Alias="HasComponent">i=00047</Alias>
+		<Alias Alias="HasNotifier">i=00048</Alias>
+		<Alias Alias="HasOrderedComponent">i=00049</Alias>
+		<Alias Alias="FromState">i=00051</Alias>
+		<Alias Alias="ToState">i=00052</Alias>
+		<Alias Alias="HasCause">i=00053</Alias>
+		<Alias Alias="HasEffect">i=00054</Alias>
+		<Alias Alias="HasHistoricalConfiguration">i=00056</Alias>
+		<Alias Alias="BaseObjectType">i=00058</Alias>
+		<Alias Alias="FolderType">i=00061</Alias>
+		<Alias Alias="BaseVariableType">i=00062</Alias>
+		<Alias Alias="BaseDataVariableType">i=00063</Alias>
+		<Alias Alias="PropertyType">i=00068</Alias>
+		<Alias Alias="DataTypeDescriptionType">i=00069</Alias>
+	</Aliases>
+	<UAObject NodeId="ns=1;i=200" BrowseName="OffNormalAlarm" WriteMask="00" UserWriteMask="00" EventNotifier="false">
+			<DisplayName>OffNormalAlarm</DisplayName>
+		<Description>OffNormalAlarm</Description>
+		<References>
+			<Reference ReferenceType="i=40" IsForward="true">i=10637</Reference>
+			<Reference ReferenceType="i=47" IsForward="true">ns=1;i=226</Reference>
+			<Reference ReferenceType="i=46" IsForward="true">ns=1;i=232</Reference>
+			<!-- <Reference ReferenceType="i=46" IsForward="true">ns=1;i=235</Reference> -->
+		</References>
+	</UAObject>
+	<UAVariable NodeId="ns=1;i=226" BrowseName="Message" WriteMask="00" UserWriteMask="00" DataType="i=21" ValueRank="-1" AccessLevel="03" UserAccessLevel="00" MinimumSamplingInterval="0.000000" Historizing="false">
+		<DisplayName>Message</DisplayName>
+		<Description>A localized description of the event.</Description>
+		<References>
+			<Reference ReferenceType="i=37" IsForward="true">i=78</Reference>
+			<Reference ReferenceType="i=40" IsForward="true">i=68</Reference>
+		</References>
+		<Value>
+			<LocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
+				<Locale xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">en-us</Locale>
+				<Text xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">PrepaStack,Qualite,%SOURCENAME ,%SOURCENODE </Text>
+			</LocalizedText>
+		</Value>
+	</UAVariable>
+	<UAVariable NodeId="ns=1;i=232" BrowseName="Severity" WriteMask="00" UserWriteMask="00" DataType="i=5" ValueRank="-1" AccessLevel="3" UserAccessLevel="00" MinimumSamplingInterval="0.000000" Historizing="false">
+		<DisplayName>Severity</DisplayName>
+		<Description>Indicates how urgent an event is.</Description>
+		<References>
+			<Reference ReferenceType="i=37" IsForward="true">i=78</Reference>
+			<Reference ReferenceType="i=40" IsForward="true">i=68</Reference>
+		</References>
+		<Value>
+			<UInt16>450</UInt16>
+		</Value>	
+	</UAVariable>
+	
+	
+	<UAObject NodeId="ns=1;i=300" BrowseName="OffNormalAlarm2" WriteMask="00" UserWriteMask="00" EventNotifier="false">
+			<DisplayName>OffNormalAlarm2</DisplayName>
+		<Description>OffNormalAlarm2</Description>
+		<References>
+			<Reference ReferenceType="i=40" IsForward="true">i=10637</Reference>
+			<Reference ReferenceType="i=47" IsForward="true">ns=1;i=326</Reference>
+			<Reference ReferenceType="i=46" IsForward="true">ns=1;i=332</Reference>
+			<!-- <Reference ReferenceType="i=46" IsForward="true">ns=1;i=235</Reference> -->
+		</References>
+	</UAObject>
+	<UAVariable NodeId="ns=1;i=326" BrowseName="Message" WriteMask="00" UserWriteMask="00" DataType="i=21" ValueRank="-1" AccessLevel="03" UserAccessLevel="00" MinimumSamplingInterval="0.000000" Historizing="false">
+		<DisplayName>Message</DisplayName>
+		<Description>A localized description of the event.</Description>
+		<References>
+			<Reference ReferenceType="i=37" IsForward="true">i=78</Reference>
+			<Reference ReferenceType="i=40" IsForward="true">i=68</Reference>
+		</References>
+		<Value>
+			<LocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
+				<Locale xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">en-us</Locale>
+				<Text xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">PrepaStack,Logistique,%SOURCENAME ,%SOURCENODE </Text>
+			</LocalizedText>
+		</Value>
+	</UAVariable>
+	<UAVariable NodeId="ns=1;i=332" BrowseName="Severity" WriteMask="00" UserWriteMask="00" DataType="i=5" ValueRank="-1" AccessLevel="3" UserAccessLevel="00" MinimumSamplingInterval="0.000000" Historizing="false">
+		<DisplayName>Severity</DisplayName>
+		<Description>Indicates how urgent an event is.</Description>
+		<References>
+			<Reference ReferenceType="i=37" IsForward="true">i=78</Reference>
+			<Reference ReferenceType="i=40" IsForward="true">i=68</Reference>
+		</References>
+		<Value>
+			<UInt16>450</UInt16>
+		</Value>	
+	</UAVariable>
+	
+</UANodeSet>

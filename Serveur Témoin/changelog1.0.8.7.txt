@@ -1,0 +1,142 @@
+1.0.8.7 Summer 2023 -
+   CoreServer  1.1.0.6
+Bug Fix 
+   Potential server crash when is configured with, +1 Vpi, MultiTags, Vfi, high frequence VpiCallback access.
+   The problem is fixed in the Server 1.1.0.0 and >
+   - When a VFI is used with the server and the low level storage is not available on startup the connection was never restored.
+		This problem is now fixed with the OOUACoreServer v1.1.0.4
+   - Fix alarm issues when clients called Refresh. Alarm was sent before RefreshStart, RefreshEnd so it can be invisible for some client.
+   - CleanupTimeoutedPublishRequest may behave incorrectly. The new version verify the the ServiceType in the publis match with the Publish service (824).
+		If not the publish is now delete. This part of the code is a prototype
+New features
+	- Change n ServerConfig schema. New XmlElement are introduce to support redundancy configuration.
+    - HistoricalAccess aggregates support.
+	  11 aggregates are implemented
+	   Average, TimeAverage, Total, Minimum, Maximum, VarianceSample, StandardDeviationSample, VariancePopulation, StandardDeviationPopulation,Count, Interpolative.
+	- When a Vfi is associated with the server a new Node called VfiVersion indicate the current version of the library.
+		This feature is only available on Windows
+	- UDT initialization from the NodeSet file. The server support UA Variable initialization for a long time.
+		Some well known datatypes initialization were hard-coded. 
+		The new version of the server now support a generic initilization mecansim from the Instances NodeSet.
+	- In order to workaround some potential OOUACoreServer crash when client publish Request are in timeout. 
+		We introduce a security mechanism verifying that ServiceType.RequestId match with the expected RequestId.
+		The method in charge of such a verification is call IsServiceTypeTypeValid in CQueuedPublishMessage class.
+	- New Redundancy features. 
+	   Starting with the 1.1.0.5 server version some new enhancement for redundancy support are introduced.
+		- Both schema ServerConfig.xsd and Subsystem.xsd change.
+			ServerConfig.xsd allows to declare optional Xml element in oouaprj files. 
+			Subsystem.xsd use 2 new attributes 
+			1- Used to indicate the VpiType, Regular or Redundancy.
+			2- Used to indicate the Vpi Priority
+			Report to the user manual for more information.
+		- New nodes are now automaticaly associated with Vpis and Vfi.This ndoe is a UAVaribale of boolean type. 
+		  It allows to stop Vfi or Vpis. Those node are supposed to be used in redundancy context but other application may raise.
+	- New security test is introduce in the VpiCallback. 
+		This test prevent wrong callback made by Vpis. In case of error an appropriate error is traced in the server log.
+	- New function in the LUA SCRIPT library. This function is called GetUAStatusCode. It allows to access StatusCode for a given node.
+OpenOpcUaStackV1 1.0.8.8
+	-  New Api  
+	   OpcUa_DateTime_AddDuration(OpcUa_DateTime* pdtVal, OpcUa_UInt64 duration)
+	    Add duration to pdtVal. pdtVal is an input/out parameter
+	   OpcUa_DateTime_CompareEx(OpcUa_DateTime dt1, OpcUa_DateTime dt2);
+	    Compare dt1 and dt2. 
+		Return -1 if dt1<dt2 
+		Return 0 if dt1==dt2
+		Return 1 if dt1>dt2
+	   OpcUa_DateTime_Sub(OpcUa_DateTime dt1, OpcUa_DateTime dt2, OpcUa_Double* pdblDiff)
+	    Calculate the diff beteen dt1 and dt2. The calculation is made only if dt1>dt2 otherwise -1 is return in pdblDiff.
+	- Evolution
+		OpcUa_Thread_Delete and OpcUa_P_Thread_Delete change their behavior. They will wait for 30 sec instead of INFINITE to terminate itself.
+
+	
+OpcUaSharedLibrary ver: 1.0.6.2
+	- 
+		* 
+ClientLibrary ver: 1.0.9.8
+   Bug fixes :
+   - 
+
+Other :
+   - 
+VPIs
+	Generic Encoder/Decoder ver 0.0.0.3
+	Fixes :
+		- Support multi dictionary definition
+	News :
+		- New log feature
+		
+	VpiNullEx 1.0.0.4
+		- 
+	VpiUaClient ver: 1.0.5.9	
+		- 
+	
+	VpiS7 ver: 1.0.3.3
+		- Fixe issue on change notification
+	VpiUaMqttJsonPub ver: 0.0.1.1
+		- 
+	VpiUaMqttJsonSub ver: 0.0.0.8
+		- 
+	VpiMdbMaster 1.0.4.3
+		- 
+	VpiMdbServer 1.0.4.2
+		- 
+	VpiValueInit 0.0.2.7
+		- New parameter in the DAT file called DATABASE_NAME
+			It allows to have a separate Schema and Database name.
+			This parameter is optional. If not specified the schema name will be user
+		- New format for Array size in payload
+		- Fix in TracelLevel handling
+		- The ValueInit can make a confusion between one element array and scalar.
+			The odd situation is fixed in the 0.0.2.7
+   
+Vpi Library ver: 1.0.4.5
+   - Fixes :
+   - New API : 
+	Vpi_StatusCode VPI_DLLCALL Vpi_DateTime_AddDuration(Vpi_UInt32 dtVal, Vpi_DateTime* pIntOutDate) 
+		add a duration (dtVal) provided in millisec to a Date_Time (pIntOutDate) passed in parameter.
+
+VFI Library ver: 0.0.1.1
+	- Fixes :
+	
+   VfiPgSql v0.0.4.2
+   Fixes:
+	- For UDT storage. If the UDT Uri cannot be found the record will not be stored. This prevent issue on reloading and enhance stability.
+		The changes might be restored in the next loop.
+	- New format for Array size in payload
+    - New parameter in the DAT file called DATABASE_NAME
+			It allows to have a separate Schema and Database name.
+			This parameter is optional. If not specified the schema name will be user
+    - in some scenario some values are not saved by the VfiPgSql. 
+	  This critical issue could leads to datelosses. 
+	  The problem is now fixed with the v0.0.3.9. 
+	- a problem appears when storing signed 8 and 16 bits integer. The previous version ignore changes and store the wrong value.
+	The Vfi contains 2 version of CountChar. I harmized the code in CVfiInternalData::CountChar and CVfiPgSql::CountChar.
+   New features
+   - A new offline buffering mechanism is introduced in VfiPgSql v0.0.4.0. This offline buffer expanded the online existing mechanism.
+   The offline storage data are kept in an ascii file called PendingRequest.dat. Those data are restored in a couple of scenario, server crash, database disconnection, etc.
+   - Buffering mechanism to external file can be deactived using the VFI DAT file. use FILE_BUFFERING_MECHANISM param with value Yes or No to activate the appropriate behavior.
+      Default value is False;
+UANodeManager (v1.0.0.9)
+	- 
+
+OpenOpcUaConfigManager ver: 0.1.0.4
+	- 
+	
+
+XiMulator (1.0.3.2) XmiToUANodeSetLibrary (1.0.6.9)
+	Fixes
+		When you mixed generation languages, Method datatype and/or attribute datatype was not properly generated.
+		This new version fixe this issue.
+	New features
+	- Loop detection mechanism
+	- New generation mode. Full and partial.
+	  The wanted mode can be selected from the configuration dialog. 
+	  The generation Full or partial is now saved with the project config file (xprj).
+	  New dataType 
+	  The main benefit is on generation time. For some model we measure that it goes from 1h15min to 4min
+	- New verification before generation. When the xmi file is exported without stereotype the generation will partialy failed.
+	  We add a new check in order to inform users in such a situation.
+	
+Enjoy
+Michel Condemine
+	

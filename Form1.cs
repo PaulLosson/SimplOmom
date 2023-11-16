@@ -19,179 +19,457 @@ using Opc.Ua;
 using System.Xml.Linq;
 using Org.BouncyCastle.Asn1.Cms;
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
+using System.Runtime.Serialization.Formatters.Binary;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+using MOM_Santé;
+using System.Reflection.Emit;
+using Label = System.Windows.Forms.Label;
+using System.Windows.Forms.VisualStyles;
+using static Opc.Ua.RelativePathFormatter;
 
 namespace MOM_Santé
 {
     public partial class Form1 : Form
     {
-
-        static string PPNotification;
+        // TODO DiscoveryClient
         //Parametre connexion serveur
-        string endpoint = "Startup";
         OpcClient client;
-        private Boolean autoConnect = false;
-        private Boolean isConnexion = true;
-        
+        private Boolean isConnexion = false;
 
-        // Default folder    
-        static readonly string rootFolder = @"C:\Temp\Data\";
-        //Default file. MAKE SURE TO CHANGE THIS LOCATION AND FILE PATH TO YOUR FILE   
-        static readonly string textFile = @"C:\Users\JV16065\Desktop\PreProd local\Line_Middleware_V2\Logs\VpiLine-26000.log";
-        static readonly string sharedClass = @"C:\Users\JV16065\Desktop\TEST SHAReD\PREPROD (local) SPRINT 7\LM\Project\Opc.Ua.NodeSet2.Emotors.Types.Shared.xml";
-        
+        WatchList watchListGlobal;
+
+        //Chien Loup management
+        bool chienLoupExist = false;
+        bool watchEnded = false;
+
+        //Depannage Management
+        OpDoneList recipe = new OpDoneList();
+        Depannage depannage;
 
         public Form1()
         {
             InitializeComponent();
-            textBox_endpoint.Text = "opc.tcp://EX0012.inetemotors.com:5776/UMY_D210_Mod1_Assembly";
-            
-            endpoint = textBox_endpoint.Text;
-            if (autoConnect)
-            {
-                client = new OpcClient(endpoint);
-                client.Connect();
-                //dotConnexionThread.Abort();
-                button_connexion.Text = "Connecté";
-                button_connexion.BackColor = Color.Green;
-            }
         }
-        
+
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            button_LoadParameter.PerformClick();
+            
+            //watchListGlobal.endpoint = "opc.tcp://10.100.1.2:5776";
+            textBox_endpoint.Text = watchListGlobal.endpoint;
+            //button_connexion.PerformClick();
+            //button_ChienLoup.PerformClick();
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-            //Thread dotConnexionThread = new Thread(new ThreadStart(ThreadDotConnexion));
-            //dotConnexionThread.Start();
-            // Read entire text file content in one string  
-            //string text = File.ReadAllText(textFile);
-            //textBox_Log.Text = text;
-
-            if(isConnexion)
+            button_connexion.Enabled = false; // Disable the button during connection attempt
+            if (!isConnexion)
             {
-                Connexion("tt");
+                await ConnexionAsync();
             }
             else
             {
-                Console.WriteLine("Deconnexion du serveur avant fermeture ...");
+                watchEnded = true;
                 client.Disconnect();
-                textBox_Log.Text = "Deconnecté";
                 button_connexion.Text = "Déconnecté";
                 button_connexion.BackColor = Color.Red;
+                isConnexion = !isConnexion;
             }
-        isConnexion = !isConnexion;
+            button_connexion.Enabled = true; // Re-enable the button after connection attempt
         }
 
-        public void Connexion(string _endpoint)
+        public async Task ConnexionAsync()
         {
             try
             {
-                _endpoint = textBox_endpoint.Text;
-                if (client == null)
+                if (client == null || client.State == OpcClientState.Created)
                 {
-                    client = new OpcClient(_endpoint);
-                    //client.NodeSet = OpcNodeSet.Load(@"C:\Users\JV16065\Desktop\TEST SHAReD\PREPROD (local) SPRINT 7\LM\Project\Opc.Ua.NodeSet2.Emotors.Types.Shared.xml");
+                    client = new OpcClient(textBox_endpoint.Text);
                 }
                 else
                 {
-                    Console.WriteLine("Merci d'arreter d'essayer de vous connecter plusieurs fois au serveur");
+                    if (client.UsedEndpoint.ToString() != textBox_endpoint.Text)
+                    {
+                        client = null;
+                        client = new OpcClient(textBox_endpoint.Text);
+                    }
+                    else if (client.State == OpcClientState.Connected)
+                    {
+                        Log("Merci d'arrêter d'essayer de vous connecter plusieurs fois au serveur");
+                        return; // No need to continue if already connected
+                    }
                 }
-                client.UseDynamic = true;
-                
-                client.Connect();
-                //dotConnexionThread.Abort();
+
+                client.Connect(); // Assuming ConnectAsync doesn't take any arguments
                 button_connexion.Text = "Connecté";
                 button_connexion.BackColor = Color.Green;
+                isConnexion = !isConnexion;
             }
-            catch
+
+            catch (Exception e)
             {
-                Console.WriteLine("Problème de connection au serveur");
+                Log("Problème de connexion au serveur " + e.Message.ToString());
                 button_connexion.Text = "XXXXXXX";
-                /*
-                for (int i = 0; i > 2; i++)
-                {
-                    client.Connect();
-                    textBox_endpoint.Text = "tentative " + i + " sur 3";
-                }
-                */
             }
         }
-
-        /*
-        public void ThreadDotConnexion()
-        {
-            String dots = ".";
-
-            for (int i = 0; i < 3; i++)
-            {
-                
-                button_connexion.Invoke(new MethodInvoker(delegate
-                {
-                    //button_connexion.Text = dots;
-                }));
-                dots = dots + ".";
-                Thread.Sleep(250);
-            }
-        }
-        */
 
         private void button_find_Click(object sender, EventArgs e)
         {
-            //CLASS//
-
+            button_ChienLoup.Enabled = false;
+            button_depannage.Enabled = false;
+            button_connexion.Enabled = false;
+            button_LoadParameter.Enabled = false;
+            button_SaveParameters.Enabled = false;
+            //Objets faisant le parsing des nodes, puis abonnement sur le PostPonedComments//
             NodeBrower nodeBrowser = new NodeBrower(client);
-            nodeBrowser.BrowsePostPonedComment(nodeBrowser.rootNode);
 
-            System.Diagnostics.Debug.WriteLine(nodeBrowser.OPList.Count().ToString() + nodeBrowser.PostPoneList.Count().ToString());
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Button button = (Button)sender;
+            button.Text = "Looking for OPs";
+            button.BackColor = Color.Brown;
+            WatchList watchList = nodeBrowser.BrowsePostPonedComment(nodeBrowser.rootNode);
+            watchList.FillLists();
+            button.Text = "Found";
+            button.BackColor = Color.AntiqueWhite;
+            stopwatch.Stop();
+            Log("Durée de l'aspiration de la config OOUA " + stopwatch.Elapsed.TotalSeconds.ToString() + " secondes");
+            watchListGlobal = watchList;
+            button_ChienLoup.Enabled = true;
+            button_depannage.Enabled = true;
+            button_connexion.Enabled = true;
+            button_LoadParameter.Enabled = true;
+            button_SaveParameters.Enabled = true;
+        }
 
-            int i= 0;
-            foreach(string op in nodeBrowser.OPList)
+        void Log(string message)
+        {
+            // Execute the delegate on the UI thread
+            textBox_Log.Invoke((MethodInvoker)delegate
             {
-                textBox_Assemblage.Text = textBox_Assemblage.Text + nodeBrowser.PostPoneList[i];
-                textBox_Log.Text = textBox_Log.Text + op;
-                System.Diagnostics.Debug.WriteLine(op);
-                System.Diagnostics.Debug.WriteLine(nodeBrowser.PostPoneList[i]);
-                UASubscribe(nodeBrowser.PostPoneList[i], op);
-                i++;
+                textBox_Log.Text += message + "\r\n";
+            });
+        }
+
+        private void button_SaveParameters_Click(object sender, EventArgs e)
+        {
+            if (watchListGlobal == null)
+            {
+                MessageBox.Show("Pas de configuration à sauvegarder");
+            }
+            else
+            {
+                watchListGlobal.endpoint = textBox_endpoint.Text;
+                if (File.Exists("config.dat"))
+                {
+
+                    DialogResult dialogResult = MessageBox.Show("Il y a déjà un fichier de configuration existant, voulez vous le supprimer ?", "Sauvegarde", MessageBoxButtons.YesNoCancel);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        button_SaveParameters.BackColor = System.Drawing.Color.Brown;
+                        watchListGlobal.SaveParameters();
+                        MessageBox.Show("Configuration Saved successfully");
+                        button_SaveParameters.BackColor = System.Drawing.Color.AliceBlue;
+                    }
+                    else if (dialogResult == DialogResult.No)
+                    {
+                        //do something else
+                    }
+                }
+
+                else
+                {
+                    button_SaveParameters.BackColor = System.Drawing.Color.Brown;
+                    watchListGlobal.SaveParameters();
+                    MessageBox.Show("Configuration Saved successfully");
+                    button_SaveParameters.BackColor = System.Drawing.Color.AliceBlue;
+                }
+
             }
         }
 
-        public void AddNotificationPostPone(string momNotif)
+        private void button_LoadParameter_Click(object sender, EventArgs e)
         {
-            textBox_Assemblage.Text = textBox_Assemblage + momNotif;
+            if (!File.Exists("config.dat"))
+            {
+                MessageBox.Show("Pas de fichier de configuration disponible pour ce serveur : " + watchListGlobal.endpoint);
+            }
+            else
+            {
+                FileStream fileStream = new FileStream("config.dat", FileMode.Open);
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                watchListGlobal = (WatchList)binaryFormatter.Deserialize(fileStream);
+                fileStream.Close();
+                button_LoadParameter.BackColor = System.Drawing.Color.Green;
+            }
         }
-        
-        public void UASubscribe(String _nodeId, string op)
-        {
-            //Conversion of String in Byte array for OPC UA Subscription
-            byte[] bytes = Encoding.Default.GetBytes(_nodeId);
 
-            //Creating subscription for Each PostponedComment
-            OpcSubscription subscription = client.SubscribeDataChange(
-            _nodeId,
-            HandleDataChanged);
+        private void button_ChienLoup_Click(object sender, EventArgs e)
+        {
+            if (client.State == OpcClientState.Disconnected) { MessageBox.Show("Veuillez vous connecter avant"); }
+            else
+            {
+                if (chienLoupExist)
+                {
+                    watchEnded = true;
+                    chienLoupExist = false;
+                    Log("Recherche des défauts en arret demandé par l'utilisateur");
+                }
+                else
+                {
+                    if (watchListGlobal == null) { MessageBox.Show("Veuillez charger une configuration avant de lancer"); }
+                    else
+                    {
+                        Action<TriggerList> updateTextDelegate = new Action<TriggerList>((TriggerList triggerList) =>
+                        {
+
+                            foreach (Control control in Controls)
+                            {
+                                if (control is Label l && l.Name.Contains("label_PP_"))
+                                    Controls.Remove(l);
+                            }
+                            string print = "";
+                            int i = 0;
+                            foreach (var triggerDC in triggerList.triggerList)
+                            {
+                                triggerDC.ppc = Translate(triggerDC);
+                                print = triggerDC.op + " : " + triggerDC.ppc + " : " + triggerDC.trk + Environment.NewLine;
+                                i++;
+                                Label label = new Label
+                                {
+                                    Text = print,
+                                    Location = new System.Drawing.Point(216, 80 + i * 30),
+                                    AutoSize = true,
+                                    Name = "label_PP_" + i.ToString()
+                                };
+                                label.Click += (sender, e) => Label_Click(sender, e, i, triggerDC);
+                                Controls.Add(label);
+                            }
+                        });
+
+                        ChienLoup wouf = new ChienLoup(client, watchListGlobal);
+                        chienLoupExist = true;
+                        watchEnded = false;
+                        Thread guardThread = new Thread(() =>
+                        {
+                            Log("Recherche des défauts activé");
+                            while (!watchEnded)
+                            {
+                                // execute the delegate on the UI thread
+                                this.Invoke(updateTextDelegate, wouf.Guard());
+                                Thread.Sleep(wouf.samplingInterval);
+                            }
+                            Log("Recherche des défauts désactivé");
+                            watchEnded = false;
+                            Thread.CurrentThread.Join();
+                        });
+                        guardThread.Start();
+                    }
+                }
+            }
         }
 
-        // TODO DiscoveryClient
-
-        public static void HandleDataChanged(object sender, OpcDataChangeReceivedEventArgs e)
+        private void Label_Click(object sender, EventArgs e, int i, TriggerDC triggerDC)
         {
-            // The 'sender' variable contains the OpcMonitoredItem with the NodeId.
-            OpcMonitoredItem item = (OpcMonitoredItem)sender;
-            System.Diagnostics.Debug.WriteLine(
-                    "Data Change from NodeId '{0}': {1} at {2}",
-                    item.NodeId,
-                    e.Item.Value, e.Item.Value.SourceTimestamp);
+            //Clear les anciens labels
+            if (checkedListBox_op_done.Items.Count != 0)
+            {
+                checkedListBox_op_done.Items.Clear();
+            }
+
+            char partId = GetPartID(triggerDC.trk);
+            string str = "";
+            SqlHoover sqlHooverRecipe = new SqlHoover(partId);
+            if (sqlHooverRecipe.opDoneList.opDoneList != null)
+            {
+                recipe = sqlHooverRecipe.opDoneList;
+                recipe.CheckDoublon();
+                foreach (OpDone ssop in recipe.opDoneList)
+                {
+                    checkedListBox_op_done.Items.Add(ssop.FromSsopToString());
+                }
+            }
+
+            str = "";
+            SqlHoover sqlHoover = new SqlHoover(triggerDC.trk);
+            sqlHoover.opDoneList.CheckDoublon();
+
+            //TrackinID Sans 
+            if (sqlHoover.opDoneList.opDoneList.Count == 0)
+            {
+                //TODO Si la pièce n'existe pas proposer la premiere OP avec bon DMC + TRK
+                MessageBox.Show("La piece n'existe pas !");
+                if (triggerDC.trk == null) { return; }
+                int opDepannageIndexLocal = watchListGlobal.opList.FindIndex(op => op.Contains("Depannage"));
+                try
+                {
+                    textBox_OP_Input.Text = recipe.opDoneList.Last().FromSsopToString();
+                }
+                catch (Exception)
+                {
+                    Log("Pas de TrackingId correct" + triggerDC.op);
+                    return;
+                }
+
+                textBox_TRK_Input.Text = triggerDC.trk;
+                textBox_DMC_Input.Text = sqlHoover.dmc;
+                if (opDepannageIndexLocal != -1)
+                {
+                    depannage = new Depannage(client, watchListGlobal.baseNodeList[opDepannageIndexLocal], watchListGlobal.opList[0], triggerDC.trk, sqlHoover.dmc, this, watchListGlobal.sendManualDCNode);
+                }
+                return;
+            }
+            OpDone last_op = sqlHoover.opDoneList.opDoneList[0];
+
+            //Check des OP DonesS
+            if (sqlHoover.opDoneList.opDoneList != null)
+            {
+                foreach (OpDone currentOp in sqlHoover.opDoneList.opDoneList)
+                {
+                    int index = 0;
+                    foreach (OpDone recipeOp in recipe.opDoneList)
+                    {
+                        if (currentOp.FromSsopToString() == recipeOp.FromSsopToString())
+                        {
+                            checkedListBox_op_done.SetItemChecked(checkedListBox_op_done.Items.IndexOf(recipeOp.FromSsopToString()), true);
+                        }
+                        if (last_op.FromSsopToString() == recipeOp.FromSsopToString())
+                        {
+                            textBox_OP_Input.Text = checkedListBox_op_done.Items[index].ToString();
+                        }
+                        index++;
+                    }
+                }
+            }
+
+            //Depannage
+            int opADepannerIndex = watchListGlobal.opList.FindIndex(op => op.Contains(textBox_OP_Input.Text));
+            int opDepannageIndex = watchListGlobal.opList.FindIndex(op => op.Contains("Depannage"));
+            if (opDepannageIndex != -1 && opADepannerIndex != -1)
+            {
+                textBox_OP_Input.Text = watchListGlobal.opList[opADepannerIndex];
+                textBox_TRK_Input.Text = triggerDC.trk;
+                textBox_DMC_Input.Text = sqlHoover.dmc;
+
+                depannage = new Depannage(client, watchListGlobal.baseNodeList[opDepannageIndex], watchListGlobal.opList[opADepannerIndex], triggerDC.trk, sqlHoover.dmc, this, watchListGlobal.sendManualDCNode);
+            }
+            else
+            {
+                Log("ERROR");
+                //TODO
+                //MessageBOx Erreur
+            }
+
+        }
+
+        private char GetPartID(string _trackingId)
+        {
+            int partIdPosition = 11;
+            if (partIdPosition >= 0 && partIdPosition < _trackingId.Length)
+            {
+                char partId = _trackingId[partIdPosition];
+
+                if (char.IsLetter(partId) && char.IsUpper(partId))
+                {
+                    return partId;
+                }
+                else
+                {
+                    MessageBox.Show("Impossible de retrouver le type de pièce " + partId + ", y a t il un trackingid correct ?");
+                    return 'X';
+                }
+            }
+            else
+            {
+                MessageBox.Show("Impossible d'interpréter le trackingID de l'OP en défaut, y a t il un trackingid correct ?");
+                return 'X';
+            }
+        }
+        private string Translate(TriggerDC triggerDC)
+        {
+            switch (triggerDC.ppc)
+            {
+                case "NOTENGAGEMENT : trackingId not found":
+                    {
+                        return "La pièce n'as pas été créer, elle n'a pas reçu la première OP";
+                        break;
+                    }
+                case "TRACEABILITY_SUBASSEMBLY trackingId(COMP1) not Found":
+                    {
+                        return "Le composant de cette pièce n'as pas été créer";
+                        break;
+                    }
+                case "TRACEABILITY_SUBASSEMBLY trackingId(COMP1) not Completed":
+                    {
+                        return "Le composant de cette pièce n'as pas été déclaré par sa dernière OP";
+                        break;
+                    }
+                case "DECLARATION: not SP and OP_Traceability != Completed  ou != Good":
+                    {
+                        return "Cette pièce ne peux pas se finir car elle possède une OP NOK";
+                        break;
+                    }
+            }
+            return triggerDC.ppc;
+        }
+
+        private void button_depannage_Click(object sender, EventArgs e)
+        {
+            if (depannage == null) 
+            {
+                Log("Start depannage");
+                depannage = new Depannage(client, textBox_OP_Input.Text, textBox_TRK_Input.Text, textBox_DMC_Input.Text, this, watchListGlobal.sendManualDCNode);
+                Thread threadDepannage = new Thread(depannage.CallDepannage);
+                threadDepannage.Start();
+            }
+            else if (client.State != OpcClientState.Connected)
+            {
+                Thread.Sleep(1000);
+                Log("Le serveur est n'est pas dans un bon état pour pouvoir lancer un dépannage, merci de le relancer");
+                button_depannage_Click(sender, e);
+            }
+            else
+            {
+                depannage = new Depannage(client,textBox_OP_Input.Text, textBox_TRK_Input.Text,textBox_DMC_Input.Text,this,watchListGlobal.sendManualDCNode);
+                Thread threadDepannage = new Thread(depannage.CallDepannage);
+                threadDepannage.Start();
+            }
+        }
+
+
+        public void UpdateControlText(string newText)
+        {
+            if (label_DMC_input.InvokeRequired)
+            {
+                // Use Invoke to safely update the control from a different thread
+                button_depannage.Invoke(new Action<string>(UpdateControlText), newText);
+            }
+            else
+            {
+                button_depannage.Text = newText;
+            }
+            MessageBox.Show(newText);
+        }
+
+        public void UpdateControlColor(Color newColor)
+        {
+            if (label_DMC_input.InvokeRequired)
+            {
+                // Use Invoke to safely update the control from a different thread
+                button_depannage.Invoke(new Action<Color>(UpdateControlColor), newColor);
+            }
+            else
+            {
+                button_depannage.BackColor = newColor;
+            }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            watchEnded = true;
+            client.Disconnect();
         }
     }
-
-
 }

@@ -1,0 +1,1 @@
+procdump -mp -e OpenOpcUaCoreServer_Debug.exe

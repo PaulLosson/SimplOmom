@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<SubSystems xmlns="http://www.openopcua.org/SubSystem.xsd">
+	<NamespaceUris>
+		<Uri>http://Emotors/Types/Shared</Uri>
+        <Uri>http://Emotors/Instance/UMY/D210/Mod1/Rotor</Uri>	
+	</NamespaceUris>
+	<SubSystem SubSystemId="ns=1;i=00800" SubSystemName="VpiValuesInit" VpiName="VpiValuesInitd" AccessMode="Subscribe">
+		<Tag Address="PartProduceList" Id='ns=2;s=Rotor.List_Sub_Of' Name="List_Sub_Of" Description="List_Sub_Of" Type="PartProduce_DataType" NbElement="1" AccessRight="Input_Output" />
+		<Tag Address="ERP_List" Id='ns=2;s=Rotor.List_ERP_OF' Name="List_ERP_OF" Description="List_ERP_OF" Type="ERP_OF_DataType" NbElement="1" AccessRight="Input_Output" />
+		<Tag Address="Calendar-Day-Start" Id='ns=2;s=Rotor.Calendar.WorkingDayTimePeriod.StartTime' Name="Day_Start" Description="Day_Start" Type="DateTime"  AccessRight="Input_Output" />
+		<Tag Address="Calendar-Day-End" Id='ns=2;s=Rotor.Calendar.WorkingDayTimePeriod.EndTime' Name="Day_End" Description="Day_End" Type="DateTime"  AccessRight="Input_Output" />
+		<Tag Address="Calendar-Shift-Start" Id='ns=2;s=Rotor.Calendar.CurrentShiftTimePeriod.StartTime' Name="Shift_Start" Description="Shift_Start" Type="DateTime"  AccessRight="Input_Output" />
+		<Tag Address="Calendar-Shift-End" Id='ns=2;s=Rotor.Calendar.CurrentShiftTimePeriod.EndTime' Name="Shift_End" Description="Shift_End" Type="DateTime"  AccessRight="Input_Output" />
+		<Tag Address="ListOfPendingDataCollects" Id="ns=2;s=Rotor.ManualDataCollect.PendingDataCollectList" Type="DataCollect_DataType" NbElement="1" AccessRight="Input_Output" Name="ListOfPendingDataCollects" Description="ListOfPendingDataCollects"></Tag>       
+
+		<!-- Shift -->
+		<Tag Address="KpiProd-Shift-NbNok" Id='ns=2;s=Rotor.KpiProduction.KpiTargetForTimePeriod.KpiShift.KpiTarget.NbCompletedNok' Name="ArchivedKpi-NbNok" Description="ArchivedKpi-NbNok" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="KpiProd-Shift-NbOk" Id='ns=2;s=Rotor.KpiProduction.KpiTargetForTimePeriod.KpiShift.KpiTarget.NbCompletedOk' Name="ArchivedKpi-NbOk" Description="ArchivedKpi-NbOk" Type="Int32"  AccessRight="Input_Output" />
+		
+		<!-- WorkingDay -->
+		<Tag Address="KpiProd-Day-NbNok" Id='ns=2;s=Rotor.KpiProduction.KpiTargetForTimePeriod.KpiWorkingDay.KpiTarget.NbCompletedNok' Name="ArchivedKpi-NbNok" Description="ArchivedKpi-NbNok" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="KpiProd-Day-NbOk" Id='ns=2;s=Rotor.KpiProduction.KpiTargetForTimePeriod.KpiWorkingDay.KpiTarget.NbCompletedOk' Name="ArchivedKpi-NbOk" Description="ArchivedKpi-NbOk" Type="Int32"  AccessRight="Input_Output" />
+				
+		
+		
+		<Tag Address="ArchivedKpi-NbNok" Id='ns=2;s=Rotor.KpiProduction.KpiProductionGlobal.HistoricalNbCompletedNok' Name="ArchivedKpi-NbNok" Description="ArchivedKpi-NbNok" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbOk" Id='ns=2;s=Rotor.KpiProduction.KpiProductionGlobal.HistoricalNbCompletedOk' Name="ArchivedKpi-NbOk" Description="ArchivedKpi-NbOk" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbOutOfLine-Ok" Id='ns=2;s=Rotor.KpiProduction.KpiProductionGlobal.HistoricalNbOutOfLineOk' Name="ArchivedKpi-NbOutOfLine-Ok" Description="ArchivedKpi-NbOutOfLine-Ok" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbOutOfLine-WaitingDecision" Id='ns=2;s=Rotor.KpiProduction.KpiProductionGlobal.HistoricalNbOutOfLineWaitingDecision' Name="ArchivedKpi-NbOutOfLine-WaitingDecision" Description="ArchivedKpi-NbOutOfLine-WaitingDecision" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbEngaged" Id='ns=2;s=Rotor.KpiProduction.KpiProductionGlobal.HistoricalNbEngaged' Name="ArchivedKpi-NbEngaged" Description="ArchivedKpi-NbEngaged" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbStraightGood" Id="ns=2;s=Rotor.KpiProduction.KpiProductionGlobal.HistoricalStraightGoodCounter" Type="Int32" AccessRight="Input_Output" Name="HistoricalStraightGoodCounter" Description="HistoricalStraightGoodCounter"></Tag>
+		
+		<Tag Address="ArchivedKpi-NbNok-T03" Id='ns=2;s=Rotor.KpiProduction.KpiProduct.M3.HistoricalNbCompletedNok' Name="ArchivedKpi-NbNok-M3" Description="ArchivedKpi-NbNok-M4" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbOk-T03" Id='ns=2;s=Rotor.KpiProduction.KpiProduct.M3.HistoricalNbCompletedOk' Name="ArchivedKpi-NbOk-M3" Description="ArchivedKpi-NbOk-M4" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbOutOfLine-Ok-T03" Id='ns=2;s=Rotor.KpiProduction.KpiProduct.M3.HistoricalNbOutOfLineOk' Name="ArchivedKpi-NbOutOfLine-Ok-M3" Description="ArchivedKpi-NbOutOfLine-Ok-M4" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbOutOfLine-WaitingDecision-T03" Id='ns=2;s=Rotor.KpiProduction.KpiProduct.M3.HistoricalNbOutOfLineWaitingDecision' Name="ArchivedKpi-NbOutOfLine-WaitingDecision-M3" Description="ArchivedKpi-NbOutOfLine-WaitingDecision-M4" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbEngaged-T03" Id='ns=2;s=Rotor.KpiProduction.KpiProduct.M3.HistoricalNbEngaged' Name="ArchivedKpi-NbEngaged-M3" Description="ArchivedKpi-NbEngaged-M4" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbStraightGood-T03" Id="ns=2;s=Rotor.KpiProduction.KpiProduct.M3.HistoricalStraightGoodCounter" Type="Int32" AccessRight="Input_Output" Name="HistoricalStraightGoodCounter" Description="HistoricalStraightGoodCounter"></Tag>
+		
+		<Tag Address="ArchivedKpi-NbNok-T04" Id='ns=2;s=Rotor.KpiProduction.KpiProduct.M4.HistoricalNbCompletedNok' Name="ArchivedKpi-NbNok-M4" Description="ArchivedKpi-NbNok-M5" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbOk-T04" Id='ns=2;s=Rotor.KpiProduction.KpiProduct.M4.HistoricalNbCompletedOk' Name="ArchivedKpi-NbOk-M4" Description="ArchivedKpi-NbOk-M5" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbOutOfLine-Ok-T04" Id='ns=2;s=Rotor.KpiProduction.KpiProduct.M4.HistoricalNbOutOfLineOk' Name="ArchivedKpi-NbOutOfLine-Ok-M4" Description="ArchivedKpi-NbOutOfLine-Ok-M5" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbOutOfLine-WaitingDecision-T04" Id='ns=2;s=Rotor.KpiProduction.KpiProduct.M4.HistoricalNbOutOfLineWaitingDecision' Name="ArchivedKpi-NbOutOfLine-WaitingDecision-M4" Description="ArchivedKpi-NbOutOfLine-WaitingDecision-M5" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbEngaged-T04" Id='ns=2;s=Rotor.KpiProduction.KpiProduct.M4.HistoricalNbEngaged' Name="ArchivedKpi-NbEngaged-M4" Description="ArchivedKpi-NbEngaged-M5" Type="Int32"  AccessRight="Input_Output" />
+		<Tag Address="ArchivedKpi-NbStraightGood-T04" Id="ns=2;s=Rotor.KpiProduction.KpiProduct.M4.HistoricalStraightGoodCounter" Type="Int32" AccessRight="Input_Output" Name="HistoricalStraightGoodCounter" Description="HistoricalStraightGoodCounter"></Tag>
+
+	</SubSystem>
+</SubSystems>

@@ -1,40 +1,54 @@
 ﻿using Opc.UaFx.Client;
 using Opc.UaFx;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;                                           
-using System.ComponentModel;
-using System.Windows.Forms;
 
 namespace MOM_Santé
 {
-    internal class ChienLoup : OpcDataChangeReceivedEventArgs
+    internal class ChienLoup
     {
-        public List<string> resultList = new List<string>();
-        public bool Cancel { get; set; }
+        OpcClient client;
+        private int i = 0;
+        public int samplingInterval = 5000;
 
-        /*
-        public ChienLoup(string nodeid,OpcDataChangeReceivedEventHandler handler, List<string> resultList)
+        public WatchList watchList;
+
+        public ChienLoup(OpcClient _client,
+            WatchList _watchList,
+            int _samplingInterval = 5000)
         {
-            this.resultList = resultList;
+            client = _client;
+            watchList = _watchList;
+            samplingInterval = _samplingInterval;
+            System.Diagnostics.Debug.WriteLine("WolfDog created");
         }
-        */
-    }
-
-    public bool fireEvent()
-    {
-        ChienLoup e = new ChienLoup();
-
-        //Don't forget a null check, assume this is an event
-        FireEventHandler(this, e);
-
-        return e.Cancel;
-    }
-
-    public void HandleFireEvent(object sender, ChienLoup e)
-    {
-        e.Cancel = true;
+        public TriggerList Guard()
+        {
+            
+            TriggerList triggerList = new TriggerList();
+            System.Diagnostics.Debug.WriteLine("Guard pooling : " + samplingInterval + " ms");
+            i = 0;
+            foreach (string ppE in watchList.ppeList)
+            {
+                while (client.State != OpcClientState.Connected) { Thread.Sleep(200); }
+                Boolean ppEnable = false;
+                try
+                {
+                    ppEnable = (bool)client.ReadNode(ppE).Value;
+                }
+                catch 
+                { 
+                    MessageBox.Show("La configuration ne correspond pas au serveur sur lequel vous êtes connecté");
+                    break;
+                }
+                if (ppEnable)
+                {
+                    OpcValue ppComment = client.ReadNode(watchList.ppcList[i]);
+                    OpcValue trk = client.ReadNode(watchList.trkList[i]);
+                    triggerList.AddTriggerDC(new TriggerDC(watchList.opList[i], (string)ppComment.Value, (string)trk.Value));
+                }
+                i++;
+            }
+            return triggerList;
+        }
     }
 }

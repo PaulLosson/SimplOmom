@@ -1,0 +1,11 @@
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug-IPV4\OpenOpcUaCoreServer_Debug.exe .
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug-IPV4\OpenOpcUaStackV1d.dll .
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug-IPV4\OpenOpcUaSharedLibd.dll .
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug-IPV4\XMLSAXParserd.dll .
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug-IPV4\OpenOpcUaVpiLibraryd.dll .
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug-IPV4\OpenOpcUaClientLibd.dll .
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug-IPV4\VpiUaClntd.dll .
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug\VpiValuesInitd.dll .
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug\OpenOpcUaVfiLibraryd.dll .
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug\VfiPgSqld.dll .
+copy C:\OpenOpcUa_Project\OpenOpcUa\bin\win64\vs2017\Debug\VPIS7d.dll .

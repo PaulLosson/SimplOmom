@@ -1,0 +1,1 @@
+host=10.57.107.15 port=5432 dbname=kpitr user=produser1 password=userprod1 connect_timeout=10

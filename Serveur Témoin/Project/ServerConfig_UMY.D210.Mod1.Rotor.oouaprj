@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServerConfig xmlns="./ServerConfig.xsd" xmlns:xsd="./ServerConfig.xsd" ServerName="UMY_RotorM3M4" CheckCrl="True" InvertReferences="True" ProjectFolder=".\Project" LogFolder=".\Logs">
+	<Trace Level="SERVER_ERROR" Output="FILE"/>
+	<DSRegistration Active="False" Interval="120"/>
+	<Binding Protocol="TCP" Port="2727" Encoding="Binary">
+		<Security Policy="None" Mode="None"/>
+		<Security Policy="Basic128Rsa15" Mode="Sign"/>
+		<Security Policy="Basic128Rsa15" Mode="SignEncrypt"/>
+		<Security Policy="Basic256" Mode="Sign"/>
+		<Security Policy="Basic256" Mode="SignEncrypt"/>
+		<Security Policy="Basic256Sha256" Mode="Sign"/>
+		<Security Policy="Basic256Sha256" Mode="SignEncrypt"/>
+		<UserToken Type="Anonymous"/>
+		<UserToken Type="UserName"/>
+		<UserToken Type="X509"/>
+	</Binding>
+
+	<FileNodeSet FullFileName="Opc.Ua.NodeSet2.Part3.xml" Locked="True"/>
+	<FileNodeSet FullFileName="Opc.Ua.NodeSet2.Part4.xml" Locked="True"/>
+	<FileNodeSet FullFileName="Opc.Ua.NodeSet2.Part5.xml" Locked="True"/>
+	<FileNodeSet FullFileName="Opc.Ua.NodeSet2.Part8.xml" Locked="True"/>
+	<FileNodeSet FullFileName="Opc.Ua.NodeSet2.Part9.xml" Locked="True"/>
+	<FileNodeSet FullFileName="Opc.Ua.NodeSet2.Part11.xml" Locked="True"/>
+	<FileNodeSet FullFileName="Opc.Ua.NodeSet2.Part13.xml" Locked="True"/>
+	<FileNodeSet FullFileName="Opc.Ua.NodeSet2.Emotors.Types.Shared.xml" Locked="True"/>
+	<FileNodeSet FullFileName="Opc.Ua.HAConfiguration-Exception.xml" Locked="True"/>
+	<FileNodeSet FullFileName="Opc.Ua.NodeSet2.Emotors.Instance.UMY.D210.Mod1.Rotor.xml" Locked="True"/>
+	
+	<!-- <HistoricalAccess ArchiveId="ns=1;i=27000" ArchiveName="SQL" VfiName="VfiPgSqld" ></HistoricalAccess> -->
+	
+	<!-- <FileSubsystem FullFileName="Opc.Ua.SubSystem.InitValue.xml"></FileSubsystem> -->
+	<!-- <FileSubsystem FullFileName="SubSystem.UaClnt-LectureArbre.xml"/> -->
+	<!-- <FileSubsystem FullFileName="SubSystem.UaClnt-ChargementStack.xml"/> -->
+	<!-- <FileSubsystem FullFileName="SubSystem.UaClnt-Magnetisation.xml"/> -->
+	<!-- <FileSubsystem FullFileName="SubSystem.UaClnt-MesureFlux.xml"/> -->
+	<!-- <FileSubsystem FullFileName="SubSystem.UaClnt-EngraveReintroduction.xml"/> -->
+	<!-- <FileSubsystem FullFileName="SubSystem.UaClnt-Equilibrage.xml"/> -->
+	<!-- <FileSubsystem FullFileName="Opc.Ua.SubSystem.VpiLineDebug.xml"/> -->
+	
+</ServerConfig>

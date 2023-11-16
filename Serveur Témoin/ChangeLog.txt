@@ -1,0 +1,15 @@
+CoreServeur
+Amélioration de la séquence d'arrêt
+Vpis
+Correction de memory leak on VpiS7
+Vfis
+Nouveau mecanisme de vérification de l'ecriture de UDT par le VfiPgSql
+
+Library
+Nouveau decodeur Base64 dans les Vfi et VpiLibrary
+
+Changement dans la ClientLib.
+Utilisation de LockClientLibApi()/UnlockClientLibApi() pour protéger les fonctions
+OpenOpcUaCreateSession
+OpenOpcUa_Read
+OpenOpcUa_Write

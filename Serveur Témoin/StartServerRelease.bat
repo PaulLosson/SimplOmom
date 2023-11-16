@@ -1,0 +1,1 @@
+OpenOpcUaCoreServer_Debug.exe .\Project\ServerConfig_UMY.D210.Mod1.Rotor.oouaprj
