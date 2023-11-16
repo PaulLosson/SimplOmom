@@ -111,13 +111,10 @@ namespace MOM_Santé
                     "ns=4;s=Rotor.ManualDataCollect",
                     "ns=4;s=Rotor.ManualDataCollect.SendManualDataCollect",
                     jsonDataCollect);
-            MessageBox.Show(result[0].ToString());
             this.form.UpdateControlColor(Color.Green);
-            Thread.Sleep(1000);
+            Thread.Sleep(2000);
             this.form.UpdateControlColor(Color.AliceBlue);
-            // Write the JSON string to a file
             File.WriteAllText(@"C:\Users\JV16065\Desktop\BUFFER\output.json", jsonDataCollect);
-            MessageBox.Show("depannage envoyé");
         }
 
         //TODO : Mettre au propre cette fonction dans une autre classe
