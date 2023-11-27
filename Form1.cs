@@ -32,7 +32,6 @@ namespace MOM_Santé
 {
     public partial class Form1 : Form
     {
-        // TODO DiscoveryClient
         //Parametre connexion serveur
         OpcClient client;
         private Boolean isConnexion = false;
@@ -42,10 +41,12 @@ namespace MOM_Santé
         //Chien Loup management
         bool chienLoupExist = false;
         bool watchEnded = false;
+        Thread guardThread;
 
         //Depannage Management
         OpDoneList recipe = new OpDoneList();
         Depannage depannage;
+        Thread threadDepannage;
 
         public Form1()
         {
@@ -55,11 +56,18 @@ namespace MOM_Santé
         private void Form1_Load(object sender, EventArgs e)
         {
             button_LoadParameter.PerformClick();
-            
-            //watchListGlobal.endpoint = "opc.tcp://10.100.1.2:5776";
-            textBox_endpoint.Text = watchListGlobal.endpoint;
-            //button_connexion.PerformClick();
-            //button_ChienLoup.PerformClick();
+            if (watchListGlobal != null)
+            {
+                //Enabled_WatchListGlobal_controls(false);
+                autoConnectToolStripMenuItem.Enabled = true;
+                autoConnectToolStripMenuItem.Checked = watchListGlobal.autoConnect;
+                textBox_endpoint.Text = watchListGlobal.endpoint;
+                if (watchListGlobal.autoConnect)
+                {
+                    button_connexion.PerformClick();
+                    button_ChienLoup.PerformClick();
+                }
+            }
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -122,21 +130,30 @@ namespace MOM_Santé
             button_connexion.Enabled = false;
             button_LoadParameter.Enabled = false;
             button_SaveParameters.Enabled = false;
-            //Objets faisant le parsing des nodes, puis abonnement sur le PostPonedComments//
-            NodeBrower nodeBrowser = new NodeBrower(client);
+            if (client != null)
+            {
+                //Objets faisant le parsing des nodes, puis abonnement sur le PostPonedComments//
+                NodeBrower nodeBrowser = new NodeBrower(client);
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            Button button = (Button)sender;
-            button.Text = "Looking for OPs";
-            button.BackColor = Color.Brown;
-            WatchList watchList = nodeBrowser.BrowsePostPonedComment(nodeBrowser.rootNode);
-            watchList.FillLists();
-            button.Text = "Found";
-            button.BackColor = Color.AntiqueWhite;
-            stopwatch.Stop();
-            Log("Durée de l'aspiration de la config OOUA " + stopwatch.Elapsed.TotalSeconds.ToString() + " secondes");
-            watchListGlobal = watchList;
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                Button button = (Button)sender;
+                button.Text = "Looking for OPs";
+                button.BackColor = Color.Brown;
+                WatchList watchList = nodeBrowser.FindOP(nodeBrowser.rootNode);
+                watchList.FillLists();
+                button.Text = "Found";
+                button.BackColor = Color.AntiqueWhite;
+                stopwatch.Stop();
+                Log("Durée de l'aspiration de la config OOUA " + stopwatch.Elapsed.TotalSeconds.ToString() + " secondes");
+                watchListGlobal = watchList;
+                Enabled_WatchListGlobal_controls(true);
+            }
+            else
+            {
+                MessageBox.Show("Connectez vous avant de faire la recherche des OPs");
+            }
+
             button_ChienLoup.Enabled = true;
             button_depannage.Enabled = true;
             button_connexion.Enabled = true;
@@ -147,10 +164,17 @@ namespace MOM_Santé
         void Log(string message)
         {
             // Execute the delegate on the UI thread
-            textBox_Log.Invoke((MethodInvoker)delegate
+            try
             {
-                textBox_Log.Text += message + "\r\n";
-            });
+                textBox_Log.Invoke((MethodInvoker)delegate
+                {
+                    textBox_Log.Text += message + "\r\n";
+                });
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         private void button_SaveParameters_Click(object sender, EventArgs e)
@@ -164,7 +188,6 @@ namespace MOM_Santé
                 watchListGlobal.endpoint = textBox_endpoint.Text;
                 if (File.Exists("config.dat"))
                 {
-
                     DialogResult dialogResult = MessageBox.Show("Il y a déjà un fichier de configuration existant, voulez vous le supprimer ?", "Sauvegarde", MessageBoxButtons.YesNoCancel);
                     if (dialogResult == DialogResult.Yes)
                     {
@@ -192,9 +215,14 @@ namespace MOM_Santé
 
         private void button_LoadParameter_Click(object sender, EventArgs e)
         {
+
             if (!File.Exists("config.dat"))
             {
-                MessageBox.Show("Pas de fichier de configuration disponible pour ce serveur : " + watchListGlobal.endpoint);
+                if (watchListGlobal == null)
+                {
+                    return;
+                }
+                MessageBox.Show("Pas de fichier de configuration disponible");
             }
             else
             {
@@ -203,6 +231,7 @@ namespace MOM_Santé
                 watchListGlobal = (WatchList)binaryFormatter.Deserialize(fileStream);
                 fileStream.Close();
                 button_LoadParameter.BackColor = System.Drawing.Color.Green;
+                Enabled_WatchListGlobal_controls(true);
             }
         }
 
@@ -242,6 +271,7 @@ namespace MOM_Santé
                                     Text = print,
                                     Location = new System.Drawing.Point(216, 80 + i * 30),
                                     AutoSize = true,
+                                    BackColor = Color.White,
                                     Name = "label_PP_" + i.ToString()
                                 };
                                 label.Click += (sender, e) => Label_Click(sender, e, i, triggerDC);
@@ -252,7 +282,7 @@ namespace MOM_Santé
                         ChienLoup wouf = new ChienLoup(client, watchListGlobal);
                         chienLoupExist = true;
                         watchEnded = false;
-                        Thread guardThread = new Thread(() =>
+                        guardThread = new Thread(() =>
                         {
                             Log("Recherche des défauts activé");
                             while (!watchEnded)
@@ -279,6 +309,19 @@ namespace MOM_Santé
                 checkedListBox_op_done.Items.Clear();
             }
 
+            //Affectation du DMC si trk vide
+            if (triggerDC.trk == "")
+            {
+                if (triggerDC.dmc == null)
+                {
+                    //Chercher directement la valeur du DMC dans le node de l'OP en defaut
+                }
+                else
+                {
+                    textBox_DMC_Input.Text = triggerDC.dmc.ToString();
+                }
+            }
+
             char partId = GetPartID(triggerDC.trk);
             string str = "";
             SqlHoover sqlHooverRecipe = new SqlHoover(partId);
@@ -301,8 +344,8 @@ namespace MOM_Santé
             {
                 //TODO Si la pièce n'existe pas proposer la premiere OP avec bon DMC + TRK
                 MessageBox.Show("La piece n'existe pas !");
-                if (triggerDC.trk == null) { return; }
-                int opDepannageIndexLocal = watchListGlobal.opList.FindIndex(op => op.Contains("Depannage"));
+                //!depannage.subOP = 0 !!!!
+                textBox_OP_Input.Text = watchListGlobal.opList[0];
                 try
                 {
                     textBox_OP_Input.Text = recipe.opDoneList.Last().FromSsopToString();
@@ -315,10 +358,10 @@ namespace MOM_Santé
 
                 textBox_TRK_Input.Text = triggerDC.trk;
                 textBox_DMC_Input.Text = sqlHoover.dmc;
-                if (opDepannageIndexLocal != -1)
-                {
-                    depannage = new Depannage(client, watchListGlobal.baseNodeList[opDepannageIndexLocal], watchListGlobal.opList[0], triggerDC.trk, sqlHoover.dmc, this, watchListGlobal.sendManualDCNode);
-                }
+                depannage = new Depannage();
+                depannage.type = 0;
+                depannage = new Depannage(client, watchListGlobal.opList[0], triggerDC.trk, sqlHoover.dmc, this, watchListGlobal.sendManualDCNode);
+
                 return;
             }
             OpDone last_op = sqlHoover.opDoneList.opDoneList[0];
@@ -344,16 +387,15 @@ namespace MOM_Santé
                 }
             }
 
-            //Depannage
+            //Prevision Depannage
             int opADepannerIndex = watchListGlobal.opList.FindIndex(op => op.Contains(textBox_OP_Input.Text));
-            int opDepannageIndex = watchListGlobal.opList.FindIndex(op => op.Contains("Depannage"));
-            if (opDepannageIndex != -1 && opADepannerIndex != -1)
+            if (opADepannerIndex != -1)
             {
                 textBox_OP_Input.Text = watchListGlobal.opList[opADepannerIndex];
                 textBox_TRK_Input.Text = triggerDC.trk;
                 textBox_DMC_Input.Text = sqlHoover.dmc;
 
-                depannage = new Depannage(client, watchListGlobal.baseNodeList[opDepannageIndex], watchListGlobal.opList[opADepannerIndex], triggerDC.trk, sqlHoover.dmc, this, watchListGlobal.sendManualDCNode);
+                depannage = new Depannage(client, watchListGlobal.opList[opADepannerIndex], triggerDC.trk, sqlHoover.dmc, this, watchListGlobal.sendManualDCNode);
             }
             else
             {
@@ -387,6 +429,7 @@ namespace MOM_Santé
                 return 'X';
             }
         }
+        
         private string Translate(TriggerDC triggerDC)
         {
             switch (triggerDC.ppc)
@@ -417,7 +460,7 @@ namespace MOM_Santé
 
         private void button_depannage_Click(object sender, EventArgs e)
         {
-            if (depannage == null) 
+            if (depannage == null)
             {
                 Log("Start depannage");
                 depannage = new Depannage(client, textBox_OP_Input.Text, textBox_TRK_Input.Text, textBox_DMC_Input.Text, this, watchListGlobal.sendManualDCNode);
@@ -432,12 +475,11 @@ namespace MOM_Santé
             }
             else
             {
-                depannage = new Depannage(client,textBox_OP_Input.Text, textBox_TRK_Input.Text,textBox_DMC_Input.Text,this,watchListGlobal.sendManualDCNode);
+                depannage = new Depannage(client, textBox_OP_Input.Text, textBox_TRK_Input.Text, textBox_DMC_Input.Text, this, watchListGlobal.sendManualDCNode);
                 Thread threadDepannage = new Thread(depannage.CallDepannage);
                 threadDepannage.Start();
             }
         }
-
 
         public void UpdateControlText(string newText)
         {
@@ -466,10 +508,61 @@ namespace MOM_Santé
             }
         }
 
+        private void Enabled_WatchListGlobal_controls(bool isEnable)
+        {
+            Color newColor;
+            if (!isEnable) { newColor = Color.Gray; }
+            else { newColor = Color.Coral; }
+            autoConnectToolStripMenuItem.Enabled = isEnable;
+            button_ChienLoup.Enabled = isEnable;
+            button_depannage.Enabled = isEnable;
+            button1_Fichier.Enabled = isEnable;
+            button1_Fichier.BackColor = newColor;
+            button_ChienLoup.BackColor = newColor;
+            button_depannage.BackColor = newColor;
+            autoConnectToolStripMenuItem.BackColor = Color.Gray;
+        }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             watchEnded = true;
-            client.Disconnect();
+            if (client != null)
+            {
+                if ((client.State != OpcClientState.Disconnecting) || (client.State != OpcClientState.Disconnected))
+                {
+                    client.Disconnect();
+                }
+            }
+            if(threadDepannage!=null)
+            {
+                if (threadDepannage.ThreadState == System.Threading.ThreadState.Running)
+                {
+                    threadDepannage.Abort();
+                }
+            }
+            if (guardThread != null)
+            {
+                if (guardThread.ThreadState == System.Threading.ThreadState.Running)
+                {
+                    guardThread.Abort();
+                }
+            }
+
+        }
+
+        private void contextMenuStrip_menu_Opening(object sender, CancelEventArgs e)
+        {
+
+        }
+
+        private void button1_Fichier_Click(object sender, EventArgs e)
+        {
+            contextMenuStrip_menu.Show(button_LoadParameter, 0, 0);
+        }
+
+        private void autoConnectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            autoConnectToolStripMenuItem.Checked = !autoConnectToolStripMenuItem.Checked;
+            watchListGlobal.autoConnect = autoConnectToolStripMenuItem.Checked;
         }
     }
 }

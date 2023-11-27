@@ -9,17 +9,18 @@ namespace MOM_Santé
     internal class ManualDataCollect
     {
         public DataCollect dataCollect;
-        private string trk { get; set; }
-        private string dmc { get; set; }
-        private string comp1 { get; set; }
-        private string emotors_id { get; set; }
-        private string customer_id { get; set; }
-        private string num_packaging { get; set; }
-        private bool endPack { get; set; }
-        private int subOpTypeEnum { get; set; }
+        public string op_num { get; set; }
+        public string trk { get; set; }
+        public string dmc { get; set; }
+        public string comp1 { get; set; }
+        public string emotors_id { get; set; }
+        public string customer_id { get; set; }
+        public string num_packaging { get; set; }
+        public bool endPack { get; set; }
+        public Int32 subOpTypeEnum { get; set; }
 
         // TODO : Faire un constructeur par Type d'OP
-        public ManualDataCollect(string _trk, string _dmc, string _comp1, string _emotorsId, string _customerId, string _numPackaging, bool _endPack, int _subOpTypeEnum)
+        public ManualDataCollect(string _trk,string _dmc, string _comp1, string _emotorsId, string _customerId, string _numPackaging, bool _endPack, int _subOpTypeEnum)
         {
             this.trk = _trk;
             this.dmc = _dmc;
@@ -116,14 +117,14 @@ namespace MOM_Santé
                     this.dataCollect = new DataCollect
                     {
                         ack_data = false,
-                        component_1 = "comp1fgd",
-                        component_2 = "comp2",
-                        component_3 = "comp3",
-                        cycle_time_real = 0.2,
+                        component_1 = "",
+                        component_2 = "",
+                        component_3 = "",
+                        cycle_time_real = 0.1,
                         data_av = false,
                         end_pack = false,
-                        location = 17,
-                        op_num = this.,
+                        location = 0,
+                        op_num = this.op_num,
                         part_id = new PartId
                         {
                             reference = "ref",
@@ -140,8 +141,8 @@ namespace MOM_Santé
                         prog_number = 2,
                         resultat_nok = false,
                         resultat_ok = true,
-                        subop_type_enum = 4,
-                        subop_type = "ee",
+                        subop_type_enum = this.subOpTypeEnum,
+                        subop_type = "Manual DataCollect",
                         control_values = new List<ControlValue> { }
                     };
                     break;

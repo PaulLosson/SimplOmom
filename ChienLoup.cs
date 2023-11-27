@@ -42,9 +42,24 @@ namespace MOM_Santé
                 }
                 if (ppEnable)
                 {
+
                     OpcValue ppComment = client.ReadNode(watchList.ppcList[i]);
                     OpcValue trk = client.ReadNode(watchList.trkList[i]);
                     triggerList.AddTriggerDC(new TriggerDC(watchList.opList[i], (string)ppComment.Value, (string)trk.Value));
+                    /*
+                    if(watchList.dmcList != null) 
+                    {
+                        OpcValue dmc = client.ReadNode(watchList.dmcList[i]);
+                        if (dmc.Value != "")
+                        {
+                            triggerList.AddTriggerDC(new TriggerDC(watchList.opList[i], (string)ppComment.Value, (string)trk.Value));
+                        }
+                    }
+                    else
+                    {
+                        triggerList.AddTriggerDC(new TriggerDC(watchList.opList[i], (string)ppComment.Value, (string)trk.Value));
+                    }
+                    */
                 }
                 i++;
             }

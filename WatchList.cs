@@ -14,11 +14,12 @@ namespace MOM_Santé
         //ppc = PostPonedComment value
         public string name;
         public string endpoint;
-        public bool autoconnect = false;
+        public bool autoConnect = false;
         public List<string> opList = new List<string>();
         public List<string> ppeList = new List<string>();
         public List<string> ppcList = new List<string>();
         public List<string> trkList = new List<string>();
+        public List<string> dmcList = new List<string>();
         public List<string> typeList = new List<string>();
         public List<string> resokList = new List<string>();
         public List<string> baseNodeList = new List<string>();
@@ -42,7 +43,7 @@ namespace MOM_Santé
         {
             opList = _opList;
             baseNodeList = _baseNodeList;
-            _endpoint = endpoint;
+            endpoint = _endpoint;
             sendManualDCNode = _sendManualDCNode;
         }
 
@@ -54,6 +55,7 @@ namespace MOM_Santé
                 ppeList.Add(baseNode + ".PostponedEnabled");
                 ppcList.Add(baseNode + ".PostponedComment");
                 trkList.Add(baseNode + ".Part_Id.SerialNum_Emotors_Id.Tracking_Id");
+                dmcList.Add(baseNode + ".Part_Id.SerialNum_Emotors_Id.Supplier_Id");
                 typeList.Add(baseNode + ".Type");
                 resokList.Add(baseNode + ".Result_OK");
             }
@@ -93,6 +95,7 @@ namespace MOM_Santé
         public string op;
         public string ppc;
         public string trk;
+        public string dmc;
 
         public event EventHandler ObjectDestroyed;
 
@@ -101,6 +104,14 @@ namespace MOM_Santé
             op = _op;
             ppc = _ppc;
             trk = _trk;
+        }
+
+        public TriggerDC(string _op, string _ppc, string _trk, string _dmc)
+        {
+            op = _op;
+            ppc = _ppc;
+            trk = _trk;
+            dmc = _dmc;
         }
 
         // Method to destroy the object

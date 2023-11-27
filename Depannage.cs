@@ -16,6 +16,7 @@ using static Opc.Ua.RelativePathFormatter;
 
 namespace MOM_Santé
 {
+    // Faire un heritage avec la classe ManualDataCollect
     internal class Depannage
     {
         public string sendManualDCNode;
@@ -45,111 +46,33 @@ namespace MOM_Santé
             sendManualDCNode = _sendManualDCNode;
         }
 
-
-        public Depannage(OpcClient _client, string _baseNode, string _op, string _trk, string _dmc, Form1 _form, string _sendManualDCNode)
-        {
-            op = _op; trk = _trk; dmc = _dmc;
-            baseNode = _baseNode;
-            client = _client;
-            this.form = _form;
-            sendManualDCNode = _sendManualDCNode;
-        }
-
-        public void SetDepannage(OpcClient _client, string _baseNode, string _op, string _trk, string _dmc, Form1 _form, string _sendManualDCNode)
-        {
-            op = _op; trk = _trk; dmc = _dmc;
-            baseNode = _baseNode;
-            client = _client;
-            this.form = _form;
-            sendManualDCNode = _sendManualDCNode;
-        }
-
         public void CallDepannage() 
         {
             this.form.UpdateControlColor(Color.DarkGray);
-            DataCollect manualDataCollect = new DataCollect
+            ManualDataCollect manualDataCollect = new ManualDataCollect
             {
-                ack_data = false,
-                component_1 = "comp1fgd",
-                component_2 = "comp2",
-                component_3 = "comp3",
-                cycle_time_real = 0.2,
-                data_av = false,
-                end_pack = false,
-                location = 17,
-                op_num = "OP203-01",
-                part_id = new PartId
-                {
-                    reference = "ref",
-                    serial_num = new SerialNum
-                    {
-                        custumer_id = "",
-                        emotors_id = "",
-                        supplier_id = "",
-                        tracking_id = trk
-                    }
-                },
-                position = 18,
-                postpone_comment = "",
-                prog_number = 2,
-                resultat_nok = false,
-                resultat_ok = true,
-                subop_type_enum = 4,
-                subop_type = "ee",
-                control_values = new List<ControlValue> {}
+                trk = trk,
+                op_num = op,
+                dmc = dmc,
+                comp1 = "",
+                num_packaging = "",
+                endPack = false,
+                subOpTypeEnum = 4
             };
-            ManualDataCollect manual = new ManualDataCollect();
-            
-            manual.DefineSubOpType();
-            string jsonDataCollect = System.Text.Json.JsonSerializer.Serialize(manualDataCollect);
-            MessageBox.Show(jsonDataCollect);
+            manualDataCollect.DefineSubOpType();
+            string jsonDataCollect = System.Text.Json.JsonSerializer.Serialize(manualDataCollect.dataCollect);
             while(client.State != OpcClientState.Connected)
             {
                 Thread.Sleep(1000);
             }
             object[] result = client.CallMethod(
-                    "ns=4;s=Rotor.ManualDataCollect",
-                    "ns=4;s=Rotor.ManualDataCollect.SendManualDataCollect",
+                    "ns=4;s=Magnet.ManualDataCollect",
+                    "ns=4;s=Magnet.ManualDataCollect.SendManualDataCollect",
                     jsonDataCollect);
             this.form.UpdateControlColor(Color.Green);
             Thread.Sleep(2000);
             this.form.UpdateControlColor(Color.AliceBlue);
             File.WriteAllText(@"C:\Users\JV16065\Desktop\BUFFER\output.json", jsonDataCollect);
-        }
-
-        //TODO : Mettre au propre cette fonction dans une autre classe
-        public void DefineSubOpType(DataCollect dataCollect, int type)
-        {
-            switch (type)
-            {
-                case 0:
-                    // Code for Type 0
-                    break;
-                case 1:
-                    // Code for Type 1
-                    break;
-                case 2:
-                    // Code for Type 2
-                    break;
-                case 3:
-                    // Code for Type 3
-                    break;
-                case 4:
-                    dataCollect.
-                    break;
-                case 5:
-                    // Code for Type 5
-                    break;
-                case 6:
-                    // Code for Type 6
-                    break;
-                case 7:
-                    // Code for Type 7
-                    break;
-                default:
-                    // Default case or error handling
-                    break;
-            }
         }
     }     
 }

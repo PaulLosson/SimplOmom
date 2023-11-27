@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             Button button_find;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             textBox_Log = new TextBox();
@@ -44,12 +45,20 @@
             label_OP_input = new Label();
             label_TRK_input = new Label();
             label_DMC_input = new Label();
+            button1_Fichier = new Button();
+            contextMenuStrip_menu = new ContextMenuStrip(components);
+            saveToolStripMenuItem = new ToolStripMenuItem();
+            loadToolStripMenuItem = new ToolStripMenuItem();
+            parametersToolStripMenuItem = new ToolStripMenuItem();
+            endpointToolStripMenuItem = new ToolStripMenuItem();
+            autoConnectToolStripMenuItem = new ToolStripMenuItem();
             button_find = new Button();
+            contextMenuStrip_menu.SuspendLayout();
             SuspendLayout();
             // 
             // button_find
             // 
-            button_find.Location = new Point(923, 36);
+            button_find.Location = new Point(1041, 36);
             button_find.Name = "button_find";
             button_find.Size = new Size(197, 29);
             button_find.TabIndex = 2;
@@ -88,7 +97,7 @@
             textBox_endpoint.Name = "textBox_endpoint";
             textBox_endpoint.Size = new Size(475, 27);
             textBox_endpoint.TabIndex = 3;
-            textBox_endpoint.Text = "opc.tcp://10.100.1.2:5776";
+            textBox_endpoint.Text = "opc.tcp://IP:PORT";
             // 
             // button_SaveParameters
             // 
@@ -114,7 +123,7 @@
             // button_ChienLoup
             // 
             button_ChienLoup.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            button_ChienLoup.Location = new Point(11, 427);
+            button_ChienLoup.Location = new Point(11, 375);
             button_ChienLoup.Name = "button_ChienLoup";
             button_ChienLoup.Size = new Size(187, 45);
             button_ChienLoup.TabIndex = 7;
@@ -157,7 +166,7 @@
             // checkedListBox_op_done
             // 
             checkedListBox_op_done.FormattingEnabled = true;
-            checkedListBox_op_done.Location = new Point(995, 80);
+            checkedListBox_op_done.Location = new Point(1087, 80);
             checkedListBox_op_done.Name = "checkedListBox_op_done";
             checkedListBox_op_done.Size = new Size(150, 796);
             checkedListBox_op_done.TabIndex = 12;
@@ -189,6 +198,57 @@
             label_DMC_input.TabIndex = 15;
             label_DMC_input.Text = "DMC : ";
             // 
+            // button1_Fichier
+            // 
+            button1_Fichier.Location = new Point(924, 36);
+            button1_Fichier.Name = "button1_Fichier";
+            button1_Fichier.Size = new Size(93, 29);
+            button1_Fichier.TabIndex = 16;
+            button1_Fichier.Text = "Fichier";
+            button1_Fichier.UseVisualStyleBackColor = true;
+            button1_Fichier.Click += button1_Fichier_Click;
+            // 
+            // contextMenuStrip_menu
+            // 
+            contextMenuStrip_menu.ImageScalingSize = new Size(20, 20);
+            contextMenuStrip_menu.Items.AddRange(new ToolStripItem[] { saveToolStripMenuItem, loadToolStripMenuItem, parametersToolStripMenuItem });
+            contextMenuStrip_menu.Name = "contextMenuStrip1";
+            contextMenuStrip_menu.Size = new Size(152, 76);
+            contextMenuStrip_menu.Text = "Fichier";
+            contextMenuStrip_menu.Opening += contextMenuStrip_menu_Opening;
+            // 
+            // saveToolStripMenuItem
+            // 
+            saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            saveToolStripMenuItem.Size = new Size(151, 24);
+            saveToolStripMenuItem.Text = "Save";
+            // 
+            // loadToolStripMenuItem
+            // 
+            loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            loadToolStripMenuItem.Size = new Size(151, 24);
+            loadToolStripMenuItem.Text = "Load";
+            // 
+            // parametersToolStripMenuItem
+            // 
+            parametersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { endpointToolStripMenuItem, autoConnectToolStripMenuItem });
+            parametersToolStripMenuItem.Name = "parametersToolStripMenuItem";
+            parametersToolStripMenuItem.Size = new Size(151, 24);
+            parametersToolStripMenuItem.Text = "Parameters";
+            // 
+            // endpointToolStripMenuItem
+            // 
+            endpointToolStripMenuItem.Name = "endpointToolStripMenuItem";
+            endpointToolStripMenuItem.Size = new Size(224, 26);
+            endpointToolStripMenuItem.Text = "Endpoint";
+            // 
+            // autoConnectToolStripMenuItem
+            // 
+            autoConnectToolStripMenuItem.Name = "autoConnectToolStripMenuItem";
+            autoConnectToolStripMenuItem.Size = new Size(224, 26);
+            autoConnectToolStripMenuItem.Text = "AutoConnect";
+            autoConnectToolStripMenuItem.Click += autoConnectToolStripMenuItem_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -196,7 +256,8 @@
             AutoSize = true;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             BackColor = Color.DarkSlateGray;
-            ClientSize = new Size(1205, 899);
+            ClientSize = new Size(1259, 899);
+            Controls.Add(button1_Fichier);
             Controls.Add(label_DMC_input);
             Controls.Add(label_TRK_input);
             Controls.Add(label_OP_input);
@@ -217,6 +278,7 @@
             Text = "MOM Santé : la supervision du MOM";
             FormClosing += Form1_FormClosing;
             Load += Form1_Load;
+            contextMenuStrip_menu.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -237,5 +299,12 @@
         private Label label_OP_input;
         private Label label_TRK_input;
         private Label label_DMC_input;
+        private Button button1_Fichier;
+        private ContextMenuStrip contextMenuStrip_menu;
+        private ToolStripMenuItem saveToolStripMenuItem;
+        private ToolStripMenuItem loadToolStripMenuItem;
+        private ToolStripMenuItem parametersToolStripMenuItem;
+        private ToolStripMenuItem endpointToolStripMenuItem;
+        private ToolStripMenuItem autoConnectToolStripMenuItem;
     }
 }
